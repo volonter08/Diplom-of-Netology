@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "868596418316",
+    "project_id": "netologyhomework-1981d",
+    "storage_bucket": "netologyhomework-1981d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:868596418316:android:1d28ad4229ef1d79556b29",
+        "android_client_info": {
+          "package_name": "com.example.netologyandroidhomework1"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC9_q9cjDX9h4bZUBWaI-UtrR9MqLY8J5g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

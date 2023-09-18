@@ -36,7 +36,7 @@
             android:layout_margin="15dp"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintTop_toTopOf="parent"
-            tools:context=".MainActivity"
+            tools:context=".activity.MainActivity"
             tools:listitem="@layout/post" />
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
     <com.google.android.material.floatingactionbutton.FloatingActionButton

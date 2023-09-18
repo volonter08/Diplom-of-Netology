@@ -4,6 +4,8 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import androidx.activity.result.contract.ActivityResultContract
+import com.example.netologyandroidhomework1.activity.PostEditAndCreateActivity
+import com.example.netologyandroidhomework1.activity.TypeOfOperationForStartNewActivity
 
 class NewPostActivityContract() : ActivityResultContract<Unit, String?>() {
     override fun createIntent(context: Context, input: Unit): Intent {

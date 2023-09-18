@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#DEE8FC"
-    tools:context=".PostEditAndCreateActivity">
+    tools:context=".activity.PostEditAndCreateActivity">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="300dp"

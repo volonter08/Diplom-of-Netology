@@ -1,6 +1,8 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
+apply plugin: 'com.google.gms.google-services'
+apply plugin: 'dagger.hilt.android.plugin'
 
 android {
     namespace "com.example.netologyandroidhomework1"
@@ -62,10 +64,15 @@ dependencies {
     def retrofitgson_version = "2.9.0"
     def okhttplogging_version = "4.11.0"
     def coroutines_version = "1.7.3"
+    def play_services_base_version = "18.1.0"
+    def hilt_version = "2.47"
 
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation "androidx.core:core-ktx:$core_version"
     implementation "androidx.appcompat:appcompat:$appcompat_version"
+    implementation platform('com.google.firebase:firebase-bom:32.3.1')
+    implementation "com.google.android.gms:play-services-base:$play_services_base_version"
+    implementation "com.google.firebase:firebase-messaging-ktx"
     implementation "androidx.constraintlayout:constraintlayout:$constraintlayout_version"
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:$swiperefreshlayout_version"
     implementation "androidx.coordinatorlayout:coordinatorlayout:$coordinatorlayout_version"
@@ -84,7 +91,8 @@ dependencies {
     implementation "com.squareup.okhttp3:logging-interceptor:$okhttplogging_version"
     implementation "com.github.bumptech.glide:glide:$glide_version"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
-
+    implementation "com.google.dagger:hilt-android:$hilt_version"
+    kapt "com.google.dagger:hilt-compiler:$hilt_version"
     testImplementation "junit:junit:$junit_version"
     androidTestImplementation "androidx.test.ext:junit:$ext_junit_version"
     androidTestImplementation "androidx.test.espresso:espresso-core:$espresso_core_version"

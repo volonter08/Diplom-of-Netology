@@ -1,4 +1,4 @@
-package com.example.netologyandroidhomework1
+package com.example.netologyandroidhomework1.activity
 
 import android.app.Activity
 import android.content.Context

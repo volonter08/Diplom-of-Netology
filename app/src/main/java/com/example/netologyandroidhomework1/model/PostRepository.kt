@@ -1,26 +1,26 @@
 package com.example.netologyandroidhomework1.model
 
 import androidx.lifecycle.map
-import com.example.netologyandroidhomework1.RetrofitObject
+import com.example.netologyandroidhomework1.PostsApiService
 import com.example.netologyandroidhomework1.dao.PostDao
 import com.example.netologyandroidhomework1.dto.Post
 import com.example.netologyandroidhomework1.entity.PostEntity
 import com.example.netologyandroidhomework1.entity.toDto
+import javax.inject.Inject
 
 
-class PostRepository(private val dao: PostDao) :
-    Repository<List<Post>> {
-    companion object {
-        const val BASE_URL = "http://10.0.2.2:9999/"
-    }
+class PostRepository @Inject constructor(
+    private val dao: PostDao,
+    val retrofitService: PostsApiService
+) : Repository<List<Post>> {
 
     val data = dao.getAll().map(List<PostEntity>::toDto)
-    val retrofitService = RetrofitObject.service
     override suspend fun getAll() {
         val response = retrofitService.getAll()
         if (!response.isSuccessful)
             throw Exception("Request is not successful")
         val listPosts = response.body() ?: emptyList()
+        println(listPosts)
         dao.insert(listPosts.map {
             PostEntity.fromDto(it)
         })
@@ -30,7 +30,7 @@ class PostRepository(private val dao: PostDao) :
         val likedPost = data.value?.find {
             it.id == id
         }!!.let {
-            it.copy(likedByMe = true, likes = it.likes+1)
+            it.copy(likedByMe = true, likes = it.likes + 1)
         }
         dao.insert(PostEntity.fromDto(likedPost))
         val response = retrofitService.likeById(id)
@@ -42,7 +42,7 @@ class PostRepository(private val dao: PostDao) :
         val dislikedPost = data.value?.find {
             it.id == id
         }!!.let {
-            it.copy(likedByMe = false, likes = if (it.likes==0) 0  else it.likes-1)
+            it.copy(likedByMe = false, likes = if (it.likes == 0) 0 else it.likes - 1)
         }
         dao.insert(PostEntity.fromDto(dislikedPost))
         val response = retrofitService.dislikeById(id)
@@ -52,6 +52,7 @@ class PostRepository(private val dao: PostDao) :
 
     fun share(id: Int) {
     }
+
     suspend fun remove(id: Long) {
         dao.removeById(id)
         val response = retrofitService.removeById(id)

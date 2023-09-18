@@ -1,9 +1,11 @@
 package com.example.netologyandroidhomework1.viewModel
 
 import android.app.Application
+import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import com.example.netologyandroidhomework1.FeedModel
@@ -16,8 +18,12 @@ import com.example.netologyandroidhomework1.model.PostRepository
 import kotlinx.coroutines.launch
 import com.example.netologyandroidhomework1.utills.SingleLiveEvent
 import com.google.gson.JsonSyntaxException
+import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
 
-class PostViewModel(application: Application) : AndroidViewModel(application) {
+@HiltViewModel
+class PostViewModel @Inject constructor(@ApplicationContext context: Context,val repository: PostRepository) : ViewModel() {
     private val postCallback = object : PostCallback {
         override fun onError(onRetryListener: OnRetryListener) {
             _dataState.postValue(
@@ -25,8 +31,6 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
             )
         }
     }
-
-    private val repository = PostRepository(AppDb.getInstance(application).postDao())
     val data: LiveData<FeedModel> = repository.data.map(::FeedModel)
     val _dataState: MutableLiveData<FeedModelState> = MutableLiveData()
     val dataState:LiveData<FeedModelState>
@@ -41,7 +45,8 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
                 _dataState.postValue(FeedModelState(loading = true))
                 repository.getAll()
                 _dataState.postValue(FeedModelState())
-            } catch (_: Exception) {
+            } catch (e: Exception) {
+                e.printStackTrace()
                 postCallback.onError {
                     loadPosts()
                 }

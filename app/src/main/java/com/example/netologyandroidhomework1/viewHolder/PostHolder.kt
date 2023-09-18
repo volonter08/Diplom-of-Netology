@@ -11,9 +11,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.netologyandroidhomework1.OnButtonTouchListener
 import com.example.netologyandroidhomework1.R
+import com.example.netologyandroidhomework1.apiModule.ApiModule.BASE_URL
 import com.example.netologyandroidhomework1.databinding.PostBinding
 import com.example.netologyandroidhomework1.dto.Post
-import com.example.netologyandroidhomework1.model.PostRepository.Companion.BASE_URL
 import com.example.netologyandroidhomework1.utills.ConverterCountFromIntToString
 
 
@@ -45,8 +45,8 @@ class PostHolder(
                 it.visibility = View.GONE
             }
         }
-        binding.menu.setOnClickListener {
-            PopupMenu(it.context, it).apply {
+        binding.menu.setOnClickListener { menu ->
+            PopupMenu(menu.context, menu).apply {
                 inflate(R.menu.options)
                 setOnMenuItemClickListener {
                     when (it.itemId) {
