@@ -7,6 +7,7 @@ import android.net.Uri
 import android.os.Build
 import android.view.View
 import android.widget.PopupMenu
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.netologyandroidhomework1.OnButtonTouchListener
@@ -45,6 +46,7 @@ class PostHolder(
                 it.visibility = View.GONE
             }
         }
+        binding.menu.isVisible = post.ownedByMe
         binding.menu.setOnClickListener { menu ->
             PopupMenu(menu.context, menu).apply {
                 inflate(R.menu.options)

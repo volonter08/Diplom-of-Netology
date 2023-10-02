@@ -9,7 +9,13 @@ import com.example.netologyandroidhomework1.dao.PostDao
 import com.example.netologyandroidhomework1.dto.Post
 import com.example.netologyandroidhomework1.entity.PostEntity
 import com.example.netologyandroidhomework1.entity.toDto
+import com.example.netologyandroidhomework1.entity.toEntity
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import javax.inject.Inject
 
 
@@ -19,7 +25,7 @@ class PostRepository @Inject constructor(
 ) : Repository<List<Post>> {
 
     val data: Flow<PagingData<Post>> = Pager(
-        config = PagingConfig(pageSize =2, enablePlaceholders = false, initialLoadSize = 2),
+        config = PagingConfig(pageSize =2, enablePlaceholders = false, initialLoadSize =2),
         pagingSourceFactory = { PostPagingSource(retrofitService) },
     ).flow
     override suspend fun getAll() {
@@ -62,6 +68,21 @@ class PostRepository @Inject constructor(
 
          */
     }
+    fun getNewerCount(id: Long): Flow<Int> = flow {
+        while (true) {
+            delay(120_000L)
+            val response = retrofitService.getNewer(id)
+            if (!response.isSuccessful) {
+                throw Exception()
+            }
+
+            val body = response.body() ?: throw Exception()
+            dao.insert(body.toEntity())
+            emit(body.size)
+        }
+    }
+        .catch { e -> throw Exception() }
+        .flowOn(Dispatchers.Default)
 
     fun share(id: Int) {
     }

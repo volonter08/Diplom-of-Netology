@@ -15,14 +15,14 @@ class PostAdapter(val context:Context,
     private val  listener:OnButtonTouchListener
 ) : PagingDataAdapter<Post, PostHolder>(PostDiffCallback()) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostHolder {
-        val binding = PostBinding.inflate(LayoutInflater.from(parent.context),parent,false)
-        return PostHolder(context,binding, listener)
+        val binding = PostBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return PostHolder(parent.context,binding,listener)
     }
+
     override fun onBindViewHolder(holder: PostHolder, position: Int) {
-        val post = getItem(position)
-        post?.let {
+        // FIXME: students will do in HW
+        getItem(position)?.let {
             holder.bind(it)
         }
-
     }
 }
