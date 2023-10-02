@@ -9,4 +9,7 @@
     <string name = "error_message"> Error. To reload posts!</string>
     <string name = "empty_message"> List of posts is empty! </string>
     <string name = "request_is_not_successful" > Request is not successful!!</string>
+    <string name="sign_in">Sign in</string>
+    <string name="sign_up">Sign up</string>
+    <string name="sign_out">Sign out</string>
 </resources>

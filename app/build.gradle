@@ -66,33 +66,52 @@ dependencies {
     def coroutines_version = "1.7.3"
     def play_services_base_version = "18.1.0"
     def hilt_version = "2.47"
-
+    def nav_version = "2.7.3"
+    def paging_version = "3.2.0"
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation "androidx.core:core-ktx:$core_version"
     implementation "androidx.appcompat:appcompat:$appcompat_version"
-    implementation platform('com.google.firebase:firebase-bom:32.3.1')
-    implementation "com.google.android.gms:play-services-base:$play_services_base_version"
-    implementation "com.google.firebase:firebase-messaging-ktx"
-    implementation "androidx.constraintlayout:constraintlayout:$constraintlayout_version"
-    implementation "androidx.swiperefreshlayout:swiperefreshlayout:$swiperefreshlayout_version"
-    implementation "androidx.coordinatorlayout:coordinatorlayout:$coordinatorlayout_version"
-    implementation "androidx.recyclerview:recyclerview:$recyclerview_version"
     implementation "androidx.activity:activity-ktx:$activity_version"
+    implementation "androidx.constraintlayout:constraintlayout:$constraintlayout_version"
+    implementation "androidx.coordinatorlayout:coordinatorlayout:$coordinatorlayout_version"
+    implementation "com.google.android.material:material:$mdc_version"
+    //Google Service and Firebase
+    implementation "com.google.android.gms:play-services-base:$play_services_base_version"
+    implementation platform('com.google.firebase:firebase-bom:32.3.1')
+    implementation "com.google.firebase:firebase-messaging-ktx"
+    //SwipeRefreshLayout
+    implementation "androidx.swiperefreshlayout:swiperefreshlayout:$swiperefreshlayout_version"
+    //RecycleView
+    implementation "androidx.recyclerview:recyclerview:$recyclerview_version"
+    //ViewModel
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
+    //LiveData
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version"
     kapt "androidx.lifecycle:lifecycle-compiler:$lifecycle_version"
-    implementation "com.google.android.material:material:$mdc_version"
+    //Room
     implementation "androidx.room:room-runtime:$room_version"
-    kapt "androidx.room:room-compiler:$room_version"
     implementation "androidx.room:room-ktx:$room_version"
+    kapt "androidx.room:room-compiler:$room_version"
+    //Retrofit
     implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
     implementation "com.squareup.retrofit2:converter-gson:$retrofitgson_version"
+    //OkHttp
     implementation "com.squareup.okhttp3:logging-interceptor:$okhttplogging_version"
+    //Glide
     implementation "com.github.bumptech.glide:glide:$glide_version"
+    //Coroutines
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
+    //Hilt
     implementation "com.google.dagger:hilt-android:$hilt_version"
     kapt "com.google.dagger:hilt-compiler:$hilt_version"
+    //Navigation
+    implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
+    implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
+    implementation "androidx.navigation:navigation-dynamic-features-fragment:$nav_version"
+
+    implementation "androidx.paging:paging-runtime-ktx:$paging_version"
+    implementation "androidx.fragment:fragment-ktx:1.6.1"
     testImplementation "junit:junit:$junit_version"
     androidTestImplementation "androidx.test.ext:junit:$ext_junit_version"
     androidTestImplementation "androidx.test.espresso:espresso-core:$espresso_core_version"

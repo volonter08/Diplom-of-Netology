@@ -100,7 +100,7 @@ class PostHolder(
 
         binding.apply {
             author.text = post.author
-            date.text = post.published
+            date.text = post.published.toString()
             content.text = post.content
             like.text = ConverterCountFromIntToString.convertCount(post.likes)
             like.isChecked = post.likedByMe
