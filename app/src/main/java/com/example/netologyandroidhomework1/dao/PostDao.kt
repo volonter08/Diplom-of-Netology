@@ -1,6 +1,7 @@
 package com.example.netologyandroidhomework1.dao
 
 import androidx.lifecycle.LiveData
+import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -10,8 +11,11 @@ import com.example.netologyandroidhomework1.entity.PostEntity
 @Dao
 interface PostDao {
     @Query("SELECT * FROM PostEntity ORDER BY id DESC")
+    fun pagingSource(): PagingSource<Int, PostEntity>
+    @Query("SELECT * FROM PostEntity ORDER BY id DESC")
     fun getAll(): LiveData<List<PostEntity>>
-
+    @Query("SELECT * FROM PostEntity ORDER BY id DESC LIMIT :count")
+    suspend fun getLatest(count:Int): List<PostEntity>
     @Query("SELECT COUNT(*) == 0 FROM PostEntity")
     suspend fun isEmpty(): Boolean
 
@@ -23,4 +27,6 @@ interface PostDao {
 
     @Query("DELETE FROM PostEntity WHERE id = :id")
     suspend fun removeById(id: Long)
+    @Query("DELETE FROM PostEntity")
+    suspend fun removeAll()
 }
