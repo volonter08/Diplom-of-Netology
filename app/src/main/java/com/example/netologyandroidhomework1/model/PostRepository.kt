@@ -33,7 +33,7 @@ class PostRepository @Inject constructor(
 
     @OptIn(ExperimentalPagingApi::class)
     val data: Flow<PagingData<Post>> = Pager(
-        config = PagingConfig(pageSize = 4, enablePlaceholders = false, initialLoadSize = 4),
+        config = PagingConfig(pageSize = 10, enablePlaceholders = false, initialLoadSize = 10),
         remoteMediator = PostRemoteMediator(retrofitService, appDb,dao,daoRemoteKey),
         pagingSourceFactory = dao::pagingSource,
     ).flow.map {pagingData->

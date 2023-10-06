@@ -18,7 +18,6 @@ class PostAdapter(val context:Context,
         val binding = PostBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return PostHolder(parent.context,binding,listener)
     }
-
     override fun onBindViewHolder(holder: PostHolder, position: Int) {
         // FIXME: students will do in HW
         getItem(position)?.let {

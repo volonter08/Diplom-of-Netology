@@ -24,6 +24,7 @@ import androidx.paging.LoadState
 import com.example.netologyandroidhomework1.OnButtonTouchListener
 import com.example.netologyandroidhomework1.R
 import com.example.netologyandroidhomework1.adapter.PostAdapter
+import com.example.netologyandroidhomework1.adapter.PostLoadingStateAdapter
 import com.example.netologyandroidhomework1.databinding.FragmentPostDisplayBinding
 import com.example.netologyandroidhomework1.dto.Post
 import com.example.netologyandroidhomework1.viewModel.PostViewModel
@@ -68,7 +69,14 @@ class PostDisplayFragment : Fragment() {
             }
         }
         val postAdapter = PostAdapter(context = requireContext(),postOnButtonTouchListener)
-        viewBinding.recycleView.adapter = postAdapter
+        viewBinding.recycleView.adapter = postAdapter.withLoadStateHeaderAndFooter(
+            header = PostLoadingStateAdapter{
+                postAdapter.retry()
+            },
+            footer = PostLoadingStateAdapter{
+                postAdapter.retry()
+            }
+        )
         viewBinding.swipeRefreshLayout.setOnRefreshListener(postAdapter::refresh)
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -121,9 +129,7 @@ class PostDisplayFragment : Fragment() {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 postAdapter.loadStateFlow.collectLatest { state ->
                     viewBinding.swipeRefreshLayout.isRefreshing =
-                        state.refresh is LoadState.Loading ||
-                                state.prepend is LoadState.Loading ||
-                                state.append is LoadState.Loading
+                        state.refresh is LoadState.Loading
                 }
             }
         }

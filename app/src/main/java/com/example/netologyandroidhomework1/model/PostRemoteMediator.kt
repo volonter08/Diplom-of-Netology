@@ -35,11 +35,19 @@ class PostRemoteMediator @Inject constructor(
             val minId = postRemoteKeyDao.min()?:-1
             val maxId = postRemoteKeyDao.max()?:-1
             val response = when (loadType) {
-                LoadType.REFRESH -> service.getNewer(maxId)
+                LoadType.REFRESH -> {
+                    if(maxId==-1L){
+                        service.getLatest(state.config.initialLoadSize)
+                    }
+                    else{
+                        service.getNewer(maxId)
+                    }
+                }
                 LoadType.PREPEND -> {
-                    return MediatorResult.Success(
+                    val id = postRemoteKeyDao.max() ?: return MediatorResult.Success(
                         endOfPaginationReached = false
                     )
+                    service.getAfter(id, state.config.pageSize)
                 }
                 LoadType.APPEND -> {
                     val id = postRemoteKeyDao.min() ?: return MediatorResult.Success(
@@ -51,7 +59,7 @@ class PostRemoteMediator @Inject constructor(
             if (!response.isSuccessful) {
                 throw Exception()
             }
-            val body = (response.body()?.reversed()?: throw Exception())
+            val body = (response.body()?: throw Exception())
             db.withTransaction {
                 when (loadType) {
                     LoadType.REFRESH -> {
@@ -97,7 +105,14 @@ class PostRemoteMediator @Inject constructor(
                             )
                         )
                     }
-                    else -> {
+                    LoadType.PREPEND -> {
+                        println(body)
+                        postRemoteKeyDao.insert(
+                            PostRemoteKeyEntity(
+                                type = PostRemoteKeyEntity.KeyType.AFTER,
+                                id = body.first().id,
+                            )
+                        )
                     }
                 }
                 postDao.insert(body.toEntity())
