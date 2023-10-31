@@ -12,4 +12,6 @@
     <string name="sign_in">Sign in</string>
     <string name="sign_up">Sign up</string>
     <string name="sign_out">Sign out</string>
+    <string name="profile">Профиль</string>
+    <string name="mews">Новости</string>
 </resources>

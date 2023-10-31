@@ -3,8 +3,10 @@
     <style name="Theme.NetologyAndroidHomeWork1" parent="Theme.Material3.DayNight">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/purple_500</item>
+        <item name="colorSurface">#fffffbfe</item>
         <item name="colorPrimaryDark">@color/purple_700</item>
         <item name="colorAccent">@color/teal_200</item>
+        <item name="bottomNavigationStyle">@style/Widget.App.BottomNavigationView</item>
         <!-- Customize your theme here. -->
     </style>
 </resources>

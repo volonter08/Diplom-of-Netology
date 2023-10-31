@@ -32,4 +32,12 @@
         <item name="android:textColor"> @color/black</item>
         <item name ="iconTint"> @color/black</item>
     </style>
+    <style name="ActionIndicator" parent = "Widget.Material3.BottomNavigationView.ActiveIndicator">
+        <item name= "android:color">?attr/colorAccent</item>
+    </style>
+    <style name="Widget.App.BottomNavigationView" parent="Widget.Material3.BottomNavigationView">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.App.BottomNavigationView</item>
+    </style>
+    <style name="ThemeOverlay.App.BottomNavigationView" parent="">
+    </style>
 </resources>
