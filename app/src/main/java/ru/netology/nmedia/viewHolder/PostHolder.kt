@@ -33,8 +33,8 @@ class PostHolder(
                 val animPlaceholder =
                     context.getDrawable(R.drawable.loading_avatar) as AnimatedImageDrawable
                 animPlaceholder.start() // probably needed
-                Glide.with(context).load(Uri.parse("${BASE_URL}avatars/${post.authorAvatar}"))
-                    .placeholder(animPlaceholder).timeout(10_000).circleCrop().into(it)
+                Glide.with(context).load(Uri.parse(post.authorAvatar)).placeholder(animPlaceholder)
+                    .error(R.drawable.null_avatar).timeout(10_000).circleCrop().into(it)
             }
         }
         binding.attachment.also {
@@ -47,33 +47,13 @@ class PostHolder(
             }
         }
         binding.menu.isVisible = post.ownedByMe
-        binding.menu.setOnClickListener { menu ->
-            PopupMenu(menu.context, menu).apply {
-                inflate(R.menu.options)
-                setOnMenuItemClickListener {
-                    when (it.itemId) {
-                        R.id.remove -> {
-                            listener.onRemoveClick(post.id)
-                            true
-                        }
-
-                        R.id.update -> {
-                            listener.onUpdateCLick(post)
-                            true
-                        }
-
-                        else -> false
-                    }
-                }
-            }
-        }
         binding.menu.setOnClickListener {
             PopupMenu(it.context, it).apply {
                 inflate(R.menu.options)
                 setOnMenuItemClickListener {
                     when (it.itemId) {
                         R.id.remove -> {
-                            listener.onRemoveClick(post.id)
+                            listener.onRemoveClick(post)
                             true
                         }
 
@@ -92,14 +72,16 @@ class PostHolder(
         }
         likeButton.setOnClickListener {
             if (!post.likedByMe)
-                listener.onLikeCLick(post.id)
+                listener.onLikeCLick(post)
             else
-                listener.onDislikeCLick(post.id)
+                listener.onDislikeCLick(post)
         }
         shareButton.setOnClickListener {
             listener.onShareCLick(post)
         }
-
+        likeButton.addOnCheckedChangeListener { button, isChecked ->
+            button.isChecked = post.likedByMe
+        }
         binding.apply {
             author.text = post.author
             date.text = post.published.toString()

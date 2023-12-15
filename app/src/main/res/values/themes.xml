@@ -1,12 +1,16 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Theme.NetologyAndroidHomeWork1" parent="Theme.Material3.DayNight">
+    <style name="Theme.NetologyAndroidHomeWork1" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/purple_500</item>
-        <item name="colorSurface">#fffffbfe</item>
-        <item name="colorPrimaryDark">@color/purple_700</item>
-        <item name="colorAccent">@color/teal_200</item>
+        <item name="colorPrimary">#0066FF</item>
+        <item name="colorSecondary">#5D00F5</item>
+        <item name="android:statusBarColor">#EB236B</item>
+        <item name="colorSurface">#5D00F5</item>
+        <item name="colorOnSurface">@color/white</item>
+        <item name="colorOnSurfaceVariant">@color/white</item>
+        <item name="colorAccent">#4BD0A0</item>
         <item name="bottomNavigationStyle">@style/Widget.App.BottomNavigationView</item>
+        <item name="android:textViewStyle">@style/Widget.App.TextView</item>
         <!-- Customize your theme here. -->
     </style>
 </resources>

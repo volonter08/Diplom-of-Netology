@@ -8,11 +8,13 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.LiveData
 import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
 import ru.netology.nmedia.ApiService
 import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.FragmentSignUpBinding
+import ru.netology.nmedia.dto.Profile
 import ru.netology.nmedia.viewModel.AuthViewModel
 import javax.inject.Inject
 
@@ -28,11 +30,14 @@ private const val ARG_PARAM2 = "param2"
  */
 @AndroidEntryPoint
 class SignUpFragment : Fragment() {
+
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
 
     private val authViewModel:AuthViewModel by activityViewModels()
+    @Inject
+    lateinit var dataProfile:LiveData<Profile>
     @Inject
     lateinit var apiService:ApiService
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,7 +57,7 @@ class SignUpFragment : Fragment() {
         signUpFragmentBinding.tryToSignIn.setOnClickListener {
             findNavController().navigate(R.id.action_signUpFragment_to_signInFragment)
         }
-        authViewModel.data.observe(viewLifecycleOwner){
+        dataProfile.observe(viewLifecycleOwner){
             if (it.id != 0 || it.token != null) {
                 findNavController().popBackStack()
             }

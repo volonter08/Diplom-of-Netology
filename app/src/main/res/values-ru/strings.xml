@@ -13,5 +13,11 @@
     <string name="sign_up">Sign up</string>
     <string name="sign_out">Sign out</string>
     <string name="profile">Профиль</string>
-    <string name="mews">Новости</string>
+    <string name="news">Новости</string>
+    <string name = "login" formatted="true">Логин:%s</string>
+    <string name = "name" formatted="true">Имя:%s</string>
+    <string name="my_profile">Мой профиль</string>
+    <string name = "participate">Участвовать</string>
+    <string name= "member">Участник</string>
+    <string name="count_members">%$d\nучастников</string>
 </resources>

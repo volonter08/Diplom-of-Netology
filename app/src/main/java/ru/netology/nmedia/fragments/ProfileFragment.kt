@@ -1,18 +1,22 @@
 package ru.netology.nmedia.fragments
 
+import android.graphics.drawable.AnimatedImageDrawable
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.LiveData
 import androidx.navigation.fragment.findNavController
+import com.bumptech.glide.Glide
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.FragmentProfileBinding
+import ru.netology.nmedia.dto.Profile
+import ru.netology.nmedia.model.ErrorCallback
+import ru.netology.nmedia.viewModel.AuthViewModel
 import ru.netology.nmedia.viewModel.ProfileViewModel
 import javax.inject.Inject
 
@@ -29,11 +33,16 @@ private const val AVATAR = "avatar"
  */
 @AndroidEntryPoint
 class ProfileFragment : Fragment() {
+    @Inject
+    lateinit var errorCallback: ErrorCallback
+    @Inject
+    lateinit var dataProfile:LiveData<Profile>
     // TODO: Rename and change types of parameters
     private var login: String? = null
     private var name: String? = null
     private var avatar: String? = null
     private val profileViewModel:ProfileViewModel by activityViewModels()
+    private val authViewModel: AuthViewModel by activityViewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,24 +53,36 @@ class ProfileFragment : Fragment() {
             avatar = it.getString(AVATAR)
         }
     }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        profileViewModel.dataAuth.observe(viewLifecycleOwner){
+        dataProfile.observe(viewLifecycleOwner){
             if(it.id == 0 && it.token == null){
                 findNavController().navigate(R.id.action_profileFragment_to_signInFragment)
             }
             else if ( it.login==null && it.name==null && it.avatar==null){
-                profileViewModel.initialUserData(it.id.toString())
+                profileViewModel.initUserData(it.id.toString())
             }
         }
-        // Inflate the layout for this fragment
         val profileFragmentBinding = FragmentProfileBinding.inflate(layoutInflater,container,false)
         profileViewModel.dataProfile.observe(viewLifecycleOwner){
-            profileFragmentBinding.login.text = it.login
-            profileFragmentBinding.name.text = it.name
+            profileFragmentBinding.login.text = String.format(getString(R.string.login),it.login)
+            profileFragmentBinding.name.text = String.format(getString(R.string.name),it.name)
+            val animPlaceHolder =  requireContext().getDrawable(R.drawable.loading_avatar) as AnimatedImageDrawable
+            animPlaceHolder.start()// probably needed
+            Glide.with(requireContext()).load(it.avatar).circleCrop().placeholder(animPlaceHolder).timeout(10_000).error(R.drawable.null_avatar).into(profileFragmentBinding.profileAvatar)
+        }
+        profileViewModel.dataState.observe(viewLifecycleOwner){
+            profileFragmentBinding.progressBarLayout.isVisible = it.loading
+            it.error?.let{
+                errorCallback.onError(it.reason,it.onRetryListener)
+            }
+        }
+        profileFragmentBinding.exit.setOnClickListener {
+            profileViewModel.exit {
+                findNavController().navigate(R.id.action_profileFragment_to_signInFragment)
+            }
         }
         return profileFragmentBinding.root
     }

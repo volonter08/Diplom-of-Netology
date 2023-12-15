@@ -1,24 +1,22 @@
-package ru.netology.nmedia.model
+package ru.netology.nmedia.repository
 
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
+import com.google.gson.Gson
 import ru.netology.nmedia.ApiService
 import ru.netology.nmedia.dao.PostDao
 import ru.netology.nmedia.dao.PostRemoteKeyDao
 import ru.netology.nmedia.db.AppDb
 import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.entity.PostEntity
-import ru.netology.nmedia.entity.toEntity
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import ru.netology.nmedia.dao.ProfileDao
+import ru.netology.nmedia.remoteMediator.PostRemoteMediator
+import ru.netology.nmedia.responses.ErrorResponse
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -26,22 +24,24 @@ import javax.inject.Singleton
 class PostRepository @Inject constructor(
     appDb: AppDb,
     private val dao: PostDao,
-    private val daoRemoteKey:PostRemoteKeyDao,
+    daoRemoteKey: PostRemoteKeyDao,
+    profileDao: ProfileDao,
     val retrofitService: ApiService
 ) : Repository<List<Post>> {
 
     @OptIn(ExperimentalPagingApi::class)
     val data: Flow<PagingData<Post>> = Pager(
         config = PagingConfig(pageSize = 10, enablePlaceholders = false, initialLoadSize = 10),
-        remoteMediator = PostRemoteMediator(retrofitService, appDb,dao,daoRemoteKey),
+        remoteMediator = PostRemoteMediator(retrofitService, appDb, dao, daoRemoteKey, profileDao),
         pagingSourceFactory = dao::pagingSource,
-    ).flow.map {pagingData->
+    ).flow.map { pagingData ->
         pagingData.map {
             it.toDto()
         }
     }
+
     override suspend fun getAll() {
-        val response = retrofitService.getAll()
+        val response = retrofitService.getAllPosts()
         if (!response.isSuccessful)
             throw Exception("Request is not successfu")
         val listPosts = response.body() ?: emptyList()
@@ -50,64 +50,49 @@ class PostRepository @Inject constructor(
         })
     }
 
-    suspend fun like(id: Int) {
-        /*
-        val likedPost = data.value?.find {
-            it.id == id
-        }!!.let {
-            it.copy(likedByMe = true, likes = it.likes + 1)
-        }
-        dao.insert(PostEntity.fromDto(likedPost))
-        val response = retrofitService.likeById(id)
-        if (!response.isSuccessful)
-            throw Exception("Request is not successful")
-
-         */
-    }
-
-    suspend fun dislike(id: Int) {
-        /*
-        val dislikedPost = data.value?.find {
-            it.id == id
-        }!!.let {
-            it.copy(likedByMe = false, likes = if (it.likes == 0) 0 else it.likes - 1)
-        }
-        dao.insert(PostEntity.fromDto(dislikedPost))
-        val response = retrofitService.dislikeById(id)
-        if (!response.isSuccessful)
-            throw Exception("Request is not successful")
-
-         */
-    }
-
-    fun getNewerCount(id: Int): Flow<Int> = flow {
-        while (true) {
-            delay(120_000L)
-            val response = retrofitService.getNewer(id)
-            if (!response.isSuccessful) {
-                throw Exception()
+    suspend fun like(likedPost: Post, token: String?) {
+        val response = retrofitService.likePostById(likedPost.id, token)
+        if (!response.isSuccessful) {
+            val error: ErrorResponse? =
+                Gson().fromJson(
+                    response.errorBody()!!.charStream(),
+                    ErrorResponse::class.java
+                )
+            throw Exception(error?.reason)
+        } else
+            response.body()?.let {
+                dao.insert(PostEntity.fromDto(it))
             }
-
-            val body = response.body() ?: throw Exception()
-            dao.insert(body.toEntity())
-            emit(body.size)
-        }
     }
-        .catch { e -> throw Exception() }
-        .flowOn(Dispatchers.Default)
+
+    suspend fun dislike(dislikedPost: Post, token: String?) {
+        val response = retrofitService.dislikePostById(dislikedPost.id, token)
+        if (!response.isSuccessful) {
+            val error: ErrorResponse? =
+                Gson().fromJson(
+                    response.errorBody()!!.charStream(),
+                    ErrorResponse::class.java
+                )
+            throw Exception(error?.reason)
+        }
+        else
+            response.body()?.let {
+                dao.insert(PostEntity.fromDto(it))
+            }
+    }
 
     fun share(id: Int) {
     }
 
-    suspend fun remove(id: Int) {
+    suspend fun remove(id: Int, token: String?) {
         dao.removeById(id)
-        val response = retrofitService.removeById(id)
+        val response = retrofitService.removePostById(id, token)
         if (!response.isSuccessful)
             throw Exception("Request is not successful")
     }
 
     suspend fun createPost(content: String) {
-        val response = retrofitService.save(
+        val response = retrofitService.savePost(
             Post(
                 id = 0,
                 content = content,
@@ -125,7 +110,7 @@ class PostRepository @Inject constructor(
     }
 
     suspend fun update(post: Post) {
-        val response = retrofitService.save(post)
+        val response = retrofitService.savePost(post)
         if (!response.isSuccessful)
             throw Exception("Request is not successful")
         val updatedPost = response.body()

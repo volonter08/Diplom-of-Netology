@@ -8,8 +8,4 @@ data class PostRemoteKeyEntity(
     @PrimaryKey
     val type: KeyType,
     val id: Int,
-) {
-    enum class KeyType {
-        AFTER, BEFORE
-    }
-}
+)

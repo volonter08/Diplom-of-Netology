@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
@@ -12,44 +11,40 @@ import androidx.paging.map
 import ru.netology.nmedia.OnRetryListener
 import ru.netology.nmedia.auth.AppAuth
 import ru.netology.nmedia.dto.Post
-import ru.netology.nmedia.model.PostCallback
-import ru.netology.nmedia.model.PostRepository
+import ru.netology.nmedia.repository.PostRepository
 import kotlinx.coroutines.launch
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import ru.netology.nmedia.FeedModelState
+import ru.netology.nmedia.responses.Error
 import javax.inject.Inject
 
 @HiltViewModel
-class PostViewModel @Inject constructor(@ApplicationContext context: Context, val repository: PostRepository,
-                                        val auth: AppAuth,) : ViewModel() {
-    private val postCallback = object : PostCallback {
-        override fun onError(onRetryListener: OnRetryListener) {
-            _dataState.postValue(
-                ru.netology.nmedia.FeedModelState(
-                    error = true,
-                    errorRetryListener = onRetryListener
-                )
-            )
-        }
-    }
+class PostViewModel @Inject constructor(
+    @ApplicationContext context: Context, val repository: PostRepository,
+    val auth: AppAuth
+) : ViewModel() {
     private val cached = repository
         .data
         .cachedIn(viewModelScope)
 
+    var tokenAccess:String? = null
     val data: Flow<PagingData<Post>> = auth.authStateFlow
-        .flatMapLatest { (myId,_,_,_,_) ->
+        .flatMapLatest { (myId, token, _, _, _) ->
+            tokenAccess= token
             cached.map { pagingData ->
                 pagingData.map { post ->
-                    post.copy(ownedByMe = post.authorId == myId)
+                    post.copy(ownedByMe = post.authorId == myId,likedByMe = post.likeOwnerIds.contains(myId))
                 }
             }
         }
     val _dataState: MutableLiveData<ru.netology.nmedia.FeedModelState> = MutableLiveData()
-    val dataState:LiveData<ru.netology.nmedia.FeedModelState>
-    get() = _dataState
+    val dataState: LiveData<ru.netology.nmedia.FeedModelState>
+        get() = _dataState
+
     init {
         loadPosts()
     }
@@ -57,51 +52,38 @@ class PostViewModel @Inject constructor(@ApplicationContext context: Context, va
     fun loadPosts() {
         viewModelScope.launch {
             try {
-                _dataState.value= ru.netology.nmedia.FeedModelState(loading = true)
-                //repository.getAll()
+                _dataState.value = ru.netology.nmedia.FeedModelState(loading = true)
+                //repository.getAllPosts()
                 _dataState.value = ru.netology.nmedia.FeedModelState()
             } catch (e: Exception) {
                 e.printStackTrace()
-                postCallback.onError {
+                onError("Request is not successful") {
                     loadPosts()
                 }
             }
         }
     }
-    fun refreshPosts(){
+    fun like(likedPost: Post) {
         viewModelScope.launch {
             try {
-                _dataState.value =
-                    ru.netology.nmedia.FeedModelState(isRefreshed = true)
-                repository.getAll()
-                _dataState.setValue(ru.netology.nmedia.FeedModelState())
-            } catch (_: Exception) {
-                postCallback.onError {
-                    refreshPosts()
+                repository.like(likedPost,tokenAccess)
+                _dataState.setValue(FeedModelState())
+            } catch (e: Exception) {
+                onError(e.message?:"") {
+                    like(likedPost)
                 }
             }
         }
     }
 
-    fun like(id: Int) {
+    fun dislike(disLikedPost: Post) {
         viewModelScope.launch {
             try {
-               repository.like(id)
-            } catch (_: Exception) {
-                postCallback.onError {
-                    like(id)
-                }
-            }
-        }
-    }
-
-    fun dislike(id: Int)  {
-        viewModelScope.launch {
-            try {
-                repository.dislike(id)
-            } catch (_: Exception) {
-                postCallback.onError {
-                    dislike(id)
+                repository.dislike(dislikedPost = disLikedPost, tokenAccess )
+                _dataState.setValue(FeedModelState())
+            } catch (e: Exception) {
+                onError(e.message?:"") {
+                    dislike(disLikedPost)
                 }
             }
         }
@@ -111,38 +93,44 @@ class PostViewModel @Inject constructor(@ApplicationContext context: Context, va
         repository.share(id)
     }
 
-    fun remove(id: Int)  {
+    fun remove(id: Int) {
         viewModelScope.launch {
             try {
-                repository.remove(id)
+                repository.remove(id,tokenAccess)
             } catch (_: Exception) {
-                postCallback.onError {
+                onError("Request is not succesfull") {
                     remove(id)
                 }
             }
         }
     }
+
     fun createPost(content: String) {
         viewModelScope.launch {
             try {
                 repository.createPost(content)
             } catch (_: Exception) {
-                postCallback.onError {
+                onError("Request is not succesfull") {
                     createPost(content)
                 }
             }
         }
     }
 
-    fun update(post: Post)  {
+    fun update(post: Post) {
         viewModelScope.launch {
             try {
                 repository.update(post)
             } catch (_: Exception) {
-                postCallback.onError {
+                onError("Request is not succesfull") {
                     update(post)
                 }
             }
         }
+    }
+
+    private fun onError(reason: String, onRetryListener: OnRetryListener) {
+        _dataState.value = FeedModelState(error = Error(reason, onRetryListener))
+        _dataState.value = FeedModelState()
     }
 }

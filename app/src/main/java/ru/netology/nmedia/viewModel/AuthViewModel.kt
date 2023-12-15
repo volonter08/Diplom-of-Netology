@@ -1,6 +1,7 @@
 package ru.netology.nmedia.viewModel
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
@@ -9,13 +10,18 @@ import ru.netology.nmedia.auth.AppAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import okhttp3.FormBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import ru.netology.nmedia.ApiService
+import ru.netology.nmedia.FeedModelState
+import ru.netology.nmedia.OnRetryListener
 import ru.netology.nmedia.dto.Profile
 import ru.netology.nmedia.exceptions.AuthException
 import ru.netology.nmedia.requests.AuthenticationRequest
+import ru.netology.nmedia.responses.Error
 import ru.netology.nmedia.responses.ErrorResponse
-import java.lang.Exception
 import javax.inject.Inject
+import kotlin.Exception
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
@@ -23,30 +29,44 @@ class AuthViewModel @Inject constructor(
     private val apiService: ApiService
 ) : ViewModel() {
     val gson = Gson()
+    val _dataState = MutableLiveData(FeedModelState())
 
-
-    val data: LiveData<Profile> = auth.authStateFlow
-        .asLiveData(Dispatchers.Default)
-    val authenticated: Boolean
-        get() = auth.authStateFlow.value.id != 0
-
+    val dataState:LiveData<FeedModelState>
+        get() {
+            return _dataState
+        }
     fun signUp(login: String, password: String, name: String) {
         viewModelScope.launch {
-            val response = apiService.signUp(login, password, name)
-            if (!response.isSuccessful) {
-                val error: ErrorResponse? =
-                    gson.fromJson(response.errorBody()!!.charStream(), ErrorResponse::class.java)
-                throw AuthException(error?.reason)
-            } else
-                response.body()?.let {
-                    auth.setAuth(it.id,it.token)
+            try {
+                _dataState.value = FeedModelState(true)
+                val formBody = FormBody.Builder().add("login",login).add("password",password).add("name",name).build()
+                val response = apiService.signUp(formBody)
+                _dataState.value = FeedModelState()
+                if (!response.isSuccessful) {
+                    val error: ErrorResponse? =
+                        gson.fromJson(
+                            response.errorBody()!!.charStream(),
+                            ErrorResponse::class.java
+                        )
+                    throw AuthException(error?.reason)
+                } else
+                    response.body()?.let {
+                        auth.setAuth(it.id, it.token)
+                    }
+            }
+            catch (e:Exception) {
+                onError(e.message) {
+                    signIn(login, password)
                 }
+            }
         }
     }
     fun signIn(login:String,password: String){
         viewModelScope.launch {
             try {
+                _dataState.value = FeedModelState(true)
                 val response = apiService.signIn(AuthenticationRequest(login,password))
+                _dataState.value = FeedModelState()
                 if (!response.isSuccessful) {
                     val error: ErrorResponse? =
                         gson.fromJson(
@@ -59,9 +79,14 @@ class AuthViewModel @Inject constructor(
                         auth.setAuth(it.id,it.token)
                     }
             }
-            catch (_:Exception){
-
+            catch (e:Exception){
+                onError(e.message){
+                    signIn(login,password)
+                }
             }
         }
+    }
+    private fun onError(reason:String?,onRetryListener: OnRetryListener){
+        _dataState.value = FeedModelState(error= Error(reason,onRetryListener))
     }
 }

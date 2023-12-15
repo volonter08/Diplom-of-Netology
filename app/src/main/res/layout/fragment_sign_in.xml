@@ -2,8 +2,7 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
 xmlns:app="http://schemas.android.com/apk/res-auto"
 android:layout_width="match_parent"
-android:layout_height="match_parent"
-android:background= "?attr/colorSurface">
+android:layout_height="match_parent">
 
 <ScrollView
     android:layout_width="match_parent"
@@ -24,6 +23,7 @@ android:background= "?attr/colorSurface">
         android:orientation="vertical">
 
         <TextView
+            style="@style/TextViewMaterialCardView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
@@ -33,6 +33,7 @@ android:background= "?attr/colorSurface">
             android:textSize="32sp" />
 
         <TextView
+            style="@style/TextViewMaterialCardView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
@@ -43,6 +44,7 @@ android:background= "?attr/colorSurface">
             android:textSize="15sp" />
 
         <TextView
+            style="@style/TextViewMaterialCardView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
@@ -66,6 +68,7 @@ android:background= "?attr/colorSurface">
         </LinearLayout>
 
         <TextView
+            style="@style/TextViewMaterialCardView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
 
@@ -104,6 +107,7 @@ android:background= "?attr/colorSurface">
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="10dp">
             <TextView
+                style="@style/TextViewMaterialCardView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
@@ -124,4 +128,17 @@ android:background= "?attr/colorSurface">
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>
 </ScrollView>
+    <FrameLayout
+        android:id="@+id/progress_bar_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="visible"
+        android:background="@color/white"
+        >
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            />
+    </FrameLayout>
 </FrameLayout>

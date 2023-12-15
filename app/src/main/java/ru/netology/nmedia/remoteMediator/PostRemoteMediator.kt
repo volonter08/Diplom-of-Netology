@@ -1,4 +1,4 @@
-package ru.netology.nmedia.model
+package ru.netology.nmedia.remoteMediator
 
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
@@ -8,11 +8,12 @@ import androidx.room.withTransaction
 import ru.netology.nmedia.ApiService
 import ru.netology.nmedia.dao.PostDao
 import ru.netology.nmedia.dao.PostRemoteKeyDao
+import ru.netology.nmedia.dao.ProfileDao
 import ru.netology.nmedia.db.AppDb
+import ru.netology.nmedia.entity.KeyType
 import ru.netology.nmedia.entity.PostEntity
 import ru.netology.nmedia.entity.PostRemoteKeyEntity
 import ru.netology.nmedia.entity.toEntity
-import java.lang.Long.min
 import javax.inject.Inject
 
 @OptIn(ExperimentalPagingApi::class)
@@ -21,6 +22,7 @@ class PostRemoteMediator @Inject constructor(
     private val db: AppDb,
     private val postDao: PostDao,
     private val postRemoteKeyDao: PostRemoteKeyDao,
+    private val profileDao: ProfileDao
 ) : RemoteMediator<Int, PostEntity>() {
 
     override suspend fun load(
@@ -33,9 +35,9 @@ class PostRemoteMediator @Inject constructor(
             val response = when (loadType) {
                 LoadType.REFRESH -> {
                     if (maxId == -1) {
-                        service.getLatest(state.config.initialLoadSize)
+                        service.getLatestPosts(state.config.initialLoadSize,profileDao.getAccessToken())
                     } else {
-                        service.getNewer(maxId)
+                        service.getNewerPosts(maxId,profileDao.getAccessToken())
                     }
                 }
 
@@ -43,14 +45,14 @@ class PostRemoteMediator @Inject constructor(
                     val id = postRemoteKeyDao.max() ?: return MediatorResult.Success(
                         endOfPaginationReached = false
                     )
-                    service.getAfter(id, state.config.pageSize)
+                    service.getAfterPost(id, state.config.pageSize,profileDao.getAccessToken())
                 }
 
                 LoadType.APPEND -> {
                     val id = postRemoteKeyDao.min() ?: return MediatorResult.Success(
                         endOfPaginationReached = false
                     )
-                    service.getBefore(id, state.config.pageSize)
+                    service.getBeforePost(id, state.config.pageSize,profileDao.getAccessToken())
                 }
             }
             if (!response.isSuccessful) {
@@ -65,11 +67,11 @@ class PostRemoteMediator @Inject constructor(
                                 listOf(
 
                                     PostRemoteKeyEntity(
-                                        type = PostRemoteKeyEntity.KeyType.AFTER,
+                                        type = KeyType.AFTER,
                                         id = body.first().id,
                                     ),
                                     PostRemoteKeyEntity(
-                                        type = PostRemoteKeyEntity.KeyType.BEFORE,
+                                        type = KeyType.BEFORE,
                                         id = if (minId == -1) body.last().id else kotlin.math.min(
                                             minId,
                                             body.last().id
@@ -82,7 +84,7 @@ class PostRemoteMediator @Inject constructor(
                         LoadType.APPEND -> {
                             postRemoteKeyDao.insert(
                                 PostRemoteKeyEntity(
-                                    type = PostRemoteKeyEntity.KeyType.BEFORE,
+                                    type = KeyType.BEFORE,
                                     id = body.last().id
                                 )
                             )
@@ -91,7 +93,7 @@ class PostRemoteMediator @Inject constructor(
                         LoadType.PREPEND -> {
                             postRemoteKeyDao.insert(
                                 PostRemoteKeyEntity(
-                                    type = PostRemoteKeyEntity.KeyType.AFTER,
+                                    type = KeyType.AFTER,
                                     id = body.first().id,
                                 )
                             )

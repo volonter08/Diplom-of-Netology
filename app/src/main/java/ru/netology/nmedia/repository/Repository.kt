@@ -1,4 +1,4 @@
-package ru.netology.nmedia.model
+package ru.netology.nmedia.repository
 
 interface  Repository<T> {
     suspend fun getAll()

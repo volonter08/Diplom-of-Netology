@@ -5,18 +5,18 @@ import android.view.ViewGroup
 import androidx.paging.LoadState
 import androidx.paging.LoadStateAdapter
 import ru.netology.nmedia.databinding.ItemLoadingBinding
-import ru.netology.nmedia.viewHolder.PostLoadingStateViewHolder
+import ru.netology.nmedia.viewHolder.ItemLoadingStateViewHolder
 
-class PostLoadingStateAdapter(val retry:()->Unit): LoadStateAdapter<PostLoadingStateViewHolder>() {
-    override fun onBindViewHolder(holder: PostLoadingStateViewHolder, loadState: LoadState) {
+class ItemLoadingStateAdapter(val retry:()->Unit): LoadStateAdapter<ItemLoadingStateViewHolder>() {
+    override fun onBindViewHolder(holder: ItemLoadingStateViewHolder, loadState: LoadState) {
         holder.bind(loadState,retry)
     }
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
         loadState: LoadState
-    ): PostLoadingStateViewHolder {
+    ): ItemLoadingStateViewHolder {
         val binding = ItemLoadingBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return PostLoadingStateViewHolder(binding,)
+        return ItemLoadingStateViewHolder(binding,)
     }
 }

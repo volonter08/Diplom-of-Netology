@@ -6,13 +6,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.LiveData
 import androidx.navigation.fragment.findNavController
 import ru.netology.nmedia.ApiService
 import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.FragmentSignInBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.MutableStateFlow
+import ru.netology.nmedia.dto.Profile
+import ru.netology.nmedia.model.ErrorCallback
 import ru.netology.nmedia.viewModel.AuthViewModel
 import javax.inject.Inject
 
@@ -30,7 +34,11 @@ private const val ARG_PARAM2 = "param2"
 class SignInFragment : Fragment() {
     private val authViewModel: AuthViewModel by activityViewModels()
     @Inject
+    lateinit var dataProfile : LiveData<Profile>
+    @Inject
     lateinit var apiService: ApiService
+    @Inject
+    lateinit var errorCallback: ErrorCallback
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
@@ -52,9 +60,14 @@ class SignInFragment : Fragment() {
         signInFragmentBinding.tryToSignUp.setOnClickListener {
             findNavController().navigate(R.id.action_signInFragment_to_signUpFragment)
         }
-        authViewModel.data.observe(viewLifecycleOwner){
+        dataProfile.observe(viewLifecycleOwner){
             if (it.id != 0 || it.token != null) {
-               findNavController().popBackStack()
+                try {
+                    findNavController().popBackStack()
+                }
+                catch (e:Exception){
+                    e.printStackTrace()
+                }
             }
         }
         signInFragmentBinding.signIn.setOnClickListener {
@@ -66,6 +79,12 @@ class SignInFragment : Fragment() {
                 password.isBlank()-> Toast.makeText(requireContext(),"Password have to be not empty!",
                     Toast.LENGTH_LONG,).show()
                 else-> authViewModel.signIn(login,password)
+            }
+        }
+        authViewModel.dataState.observe(viewLifecycleOwner){
+            signInFragmentBinding.progressBarLayout.isVisible = it.loading
+            it.error?.let {
+                errorCallback.onError(it.reason,it.onRetryListener)
             }
         }
         return signInFragmentBinding.root

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/news"
+    app:startDestination="@id/postDisplayFragment">
+    <fragment
+        android:id="@+id/postDisplayFragment"
+        android:name="ru.netology.nmedia.fragments.PostDisplayFragment"
+        android:label="PostDisplayFragment">
+        <action
+            android:id="@+id/action_postDisplayFragment_to_savePostFragment"
+            app:destination="@id/savePostFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/savePostFragment"
+        android:name="ru.netology.nmedia.fragments.SavePostFragment"
+        android:label="SavePostFragment" />
+</navigation>

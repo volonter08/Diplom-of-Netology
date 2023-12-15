@@ -1,6 +1,8 @@
 package ru.netology.nmedia.auth
 
 import android.content.Context
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.map
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
@@ -15,6 +17,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import ru.netology.nmedia.ApiService
@@ -32,22 +35,24 @@ class AppAuth @Inject constructor(
     @ApplicationContext private val context: Context,
     private val profileDao: ProfileDao
 ) {
-    private val _authStateFlow: StateFlow<Profile> = profileDao.getProfileData().map {
+    val authStateFlow= profileDao.getProfileData().mapLatest {
         if (it.isNotEmpty())
             it.first().toDto()
         else
             Profile()
-    }.stateIn(CoroutineScope(Dispatchers.Default), SharingStarted.Eagerly,Profile())
-
-    val authStateFlow: StateFlow<Profile> = _authStateFlow
+    }
 
     @InstallIn(SingletonComponent::class)
     @EntryPoint
     interface AppAuthEntryPoint {
         fun apiService(): ApiService
     }
-    suspend fun setAuth(id:Int,token:String) {
+    suspend fun setAuth(id:Int = 0,token:String? = null) {
+        println("Auth")
         profileDao.insert(ProfileEntity(ProfileData.PROFILE,id=id,token=token))
+    }
+    suspend fun updateUserData(id: Int,login:String?,name:String?,avatar:String?){
+        profileDao.updateProfile(id,login,name,avatar)
     }
     @Synchronized
     private fun getApiService(context: Context): ApiService {

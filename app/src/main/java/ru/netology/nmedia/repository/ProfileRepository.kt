@@ -1,10 +1,6 @@
-package ru.netology.nmedia.model
+package ru.netology.nmedia.repository
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
-import kotlinx.coroutines.launch
 import ru.netology.nmedia.ApiService
 import ru.netology.nmedia.dao.ProfileDao
 import ru.netology.nmedia.dto.Profile
@@ -16,8 +12,6 @@ import javax.inject.Inject
 import javax.inject.Singleton
 @Singleton
 class ProfileRepository @Inject constructor(val apiService: ApiService,private val profileDao: ProfileDao){
-
-
     suspend fun getUserData(id: String):User? {
         val response = apiService.getUserById(id)
         if (!response.isSuccessful) {

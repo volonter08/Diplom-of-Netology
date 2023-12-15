@@ -1,52 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_fragments"
-    app:startDestination="@id/postDisplayFragment">
-    <fragment
-        android:id="@+id/signInFragment"
-        android:name="ru.netology.nmedia.fragments.SignInFragment"
-        android:label="SignInFragment">
-        <action
-            android:id="@+id/action_signInFragment_to_signUpFragment"
-            app:destination="@id/signUpFragment"
-            app:popUpTo="@id/profileFragment" />
-    </fragment>
-    <fragment
-        android:id="@+id/signUpFragment"
-        android:name="ru.netology.nmedia.fragments.SignUpFragment"
-        android:label="SignUpFragment" >
-        <action
-            android:id="@+id/action_signUpFragment_to_signInFragment"
-            app:destination="@id/signInFragment"
-            app:popUpTo="@id/profileFragment" />
-    </fragment>
-    <fragment
-        android:id="@+id/postDisplayFragment"
-        android:name="ru.netology.nmedia.fragments.PostDisplayFragment"
-        android:label="PostDisplayFragment">
-        <action
-            android:id="@+id/action_postDisplayFragment_to_savePostFragment"
-            app:destination="@id/savePostFragment" />
-    </fragment>
-    <fragment
-        android:id="@+id/savePostFragment"
-        android:name="ru.netology.nmedia.fragments.SavePostFragment"
-        android:label="SavePostFragment" />
-    <fragment
-        android:id="@+id/profileFragment"
-        android:name="ru.netology.nmedia.fragments.ProfileFragment"
-        android:label="fragment_profile"
-        tools:layout="@layout/fragment_profile" >
-        <action
-            android:id="@+id/action_profileFragment_to_signInFragment"
-            app:destination="@id/signInFragment"
-            app:popUpTo="@id/profileFragment" />
-        <action
-            android:id="@+id/action_profileFragment_to_signUpFragment"
-            app:destination="@id/signUpFragment"
-            app:popUpTo="@id/profileFragment" />
-    </fragment>
-
+    app:startDestination="@id/news">
+    <include app:graph="@navigation/news"/>
+    <include app:graph= "@navigation/profile"/>
 </navigation>

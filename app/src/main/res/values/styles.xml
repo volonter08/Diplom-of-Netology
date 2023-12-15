@@ -2,8 +2,8 @@
 <resources>
 
     <style name="Widget.App.TextButton" parent="Widget.Material3.Button.TextButton">
-        <item name="android:minHeight">?attr/minTouchTargetSize</item>
-        <item name="android:minWidth">?attr/minTouchTargetSize</item>
+        <item name="android:minHeight">0dp</item>
+        <item name="android:minWidth">0dp</item>
         <item name="android:textColor">?attr/colorOnSecondaryContainer</item>
     </style>
 
@@ -16,11 +16,16 @@
     </style>
 
     <style name="Widget.App.IconButton.Options" parent="Widget.Material3.Button.IconButton">
-        <item name="iconTint">@color/share_tint</item>
         <item name="android:paddingTop">0dp</item>
         <item name="android:paddingRight">0dp</item>
+        <item name="android:paddingLeft">0dp</item>
+        <item name="android:paddingBottom">0dp</item>
         <item name="android:minHeight">0dp</item>
         <item name="android:minWidth">0dp</item>
+        <item name="iconSize">@null</item>
+    </style>
+    <style name="Widget.App.TextView" parent = "Widget.MaterialComponents.TextView">
+        <item name="autoSizeTextType">uniform</item>
     </style>
 
     <style name="ThemeOverlay.App" parent="ThemeOverlay.Material3.Light">
@@ -39,5 +44,12 @@
         <item name="materialThemeOverlay">@style/ThemeOverlay.App.BottomNavigationView</item>
     </style>
     <style name="ThemeOverlay.App.BottomNavigationView" parent="">
+    </style>
+    <style name="TextViewMaterialCardView">
+        <item name="android:textColor">@color/white</item>
+    </style>
+    <style name="ShapeAppearanceOverlayExtended" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">30dp</item>
     </style>
 </resources>

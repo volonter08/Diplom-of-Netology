@@ -16,6 +16,13 @@
     <string name="sign_out">Sign out</string>
     <string name="profile">Profile</string>
     <string name="news">News</string>
+    <string name="login" formatted="false">Login:%s</string>
+    <string name="name" formatted="false">Name:%s</string>
+    <string name="my_profile">My Profile</string>
+    <string name="participate">Participate</string>
+    <string name="member">Member</string>
+    <string name="count_members">%$d\nmembers</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <!-- TODO: Remove or change this placeholder text -->
 </resources>
