@@ -10,7 +10,6 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.LiveData
 import androidx.navigation.fragment.findNavController
-import ru.netology.nmedia.ApiService
 import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.FragmentSignInBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -35,8 +34,6 @@ class SignInFragment : Fragment() {
     private val authViewModel: AuthViewModel by activityViewModels()
     @Inject
     lateinit var dataProfile : LiveData<Profile>
-    @Inject
-    lateinit var apiService: ApiService
     @Inject
     lateinit var errorCallback: ErrorCallback
     // TODO: Rename and change types of parameters

@@ -6,11 +6,11 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
 import com.google.gson.Gson
-import ru.netology.nmedia.ApiService
 import ru.netology.nmedia.db.AppDb
 import ru.netology.nmedia.dto.Post
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import ru.netology.nmedia.AllEventsApiService
 import ru.netology.nmedia.dao.EventDao
 import ru.netology.nmedia.dao.EventRemoteKeyDao
 import ru.netology.nmedia.dao.ProfileDao
@@ -27,11 +27,11 @@ class EventRepository @Inject constructor(
     private val dao: EventDao,
     daoRemoteKey: EventRemoteKeyDao,
     profileDao: ProfileDao,
-    val retrofitService: ApiService
-) : Repository<List<Event>> {
+    val retrofitService: AllEventsApiService
+) : Repository<Event> {
 
     @OptIn(ExperimentalPagingApi::class)
-    val data: Flow<PagingData<Event>> = Pager(
+    override val data: Flow<PagingData<Event>> = Pager(
         config = PagingConfig(pageSize = 10, enablePlaceholders = false, initialLoadSize = 10),
         remoteMediator = EventRemoteMediator(retrofitService, appDb, dao, daoRemoteKey, profileDao),
         pagingSourceFactory = dao::pagingSource
@@ -40,18 +40,7 @@ class EventRepository @Inject constructor(
             it.toDto()
         }
     }
-
-    override suspend fun getAll() {
-        val response = retrofitService.getAllEvents()
-        if (!response.isSuccessful)
-            throw Exception("Request is not successfu")
-        val listPosts = response.body() ?: emptyList()
-        dao.insert(listPosts.map {
-            EventEntity.fromDto(it)
-        })
-    }
-
-    suspend fun like(likedPost: Event, token: String?) {
+    override suspend fun like(likedPost: Event, token: String?) {
         val response = retrofitService.likeEventById(likedPost.id, token)
         if (!response.isSuccessful) {
             val error: ErrorResponse? =
@@ -66,7 +55,7 @@ class EventRepository @Inject constructor(
             }
     }
 
-    suspend fun dislike(dislikedPost: Event, token: String?) {
+    override suspend fun dislike(dislikedPost: Event, token: String?) {
         val response = retrofitService.dislikeEventById(dislikedPost.id, token)
         if (!response.isSuccessful) {
             val error: ErrorResponse? =
@@ -85,11 +74,19 @@ class EventRepository @Inject constructor(
     fun share(id: Int) {
     }
 
-    suspend fun remove(id: Int, token: String?) {
-        dao.removeById(id)
-        val response = retrofitService.removeEventById(id, token)
+    override suspend fun remove(event: Event, token: String?) {
+        dao.removeById(event.id)
+        val response = retrofitService.removeEventById(event.id, token)
         if (!response.isSuccessful)
             throw Exception("Request is not successful")
+    }
+
+    override suspend fun createPost(content: String) {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun update(post: Post) {
+        TODO("Not yet implemented")
     }
     /*
     suspend fun createPost(content: String) {

@@ -8,6 +8,11 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.map
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
+import dagger.hilt.EntryPoints
+import dagger.hilt.android.EntryPointAccessors
 import ru.netology.nmedia.OnRetryListener
 import ru.netology.nmedia.auth.AppAuth
 import ru.netology.nmedia.dto.Post
@@ -19,14 +24,26 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import ru.netology.nmedia.FeedModelState
+import ru.netology.nmedia.PostRepositoryEntryPoint
+import ru.netology.nmedia.repository.Repository
+import ru.netology.nmedia.repository.UserPostRepositoryFactory
 import ru.netology.nmedia.responses.Error
 import javax.inject.Inject
-
-@HiltViewModel
-class PostViewModel @Inject constructor(
-    @ApplicationContext context: Context, val repository: PostRepository,
+@HiltViewModel(assistedFactory = PostViewModelFactory::class)
+class PostViewModel  @AssistedInject constructor(
+    @Assisted
+    val authorId: Int,
+    @ApplicationContext context: Context,
     val auth: AppAuth
 ) : ViewModel() {
+
+
+    val entryPoint:PostRepositoryEntryPoint = EntryPointAccessors.fromApplication(context,PostRepositoryEntryPoint::class.java)
+    val repository:PostRepository = when( authorId){
+        0-> entryPoint.myPostRepository()
+        -1 -> entryPoint.allPostRepository()
+        else -> entryPoint.myPostRepository()
+    }
     private val cached = repository
         .data
         .cachedIn(viewModelScope)
@@ -44,25 +61,6 @@ class PostViewModel @Inject constructor(
     val _dataState: MutableLiveData<ru.netology.nmedia.FeedModelState> = MutableLiveData()
     val dataState: LiveData<ru.netology.nmedia.FeedModelState>
         get() = _dataState
-
-    init {
-        loadPosts()
-    }
-
-    fun loadPosts() {
-        viewModelScope.launch {
-            try {
-                _dataState.value = ru.netology.nmedia.FeedModelState(loading = true)
-                //repository.getAllPosts()
-                _dataState.value = ru.netology.nmedia.FeedModelState()
-            } catch (e: Exception) {
-                e.printStackTrace()
-                onError("Request is not successful") {
-                    loadPosts()
-                }
-            }
-        }
-    }
     fun like(likedPost: Post) {
         viewModelScope.launch {
             try {
@@ -93,13 +91,13 @@ class PostViewModel @Inject constructor(
         repository.share(id)
     }
 
-    fun remove(id: Int) {
+    fun remove(post: Post) {
         viewModelScope.launch {
             try {
-                repository.remove(id,tokenAccess)
+                repository.remove(post,tokenAccess)
             } catch (_: Exception) {
                 onError("Request is not succesfull") {
-                    remove(id)
+                    remove(post)
                 }
             }
         }
@@ -133,4 +131,8 @@ class PostViewModel @Inject constructor(
         _dataState.value = FeedModelState(error = Error(reason, onRetryListener))
         _dataState.value = FeedModelState()
     }
+}
+@AssistedFactory
+interface PostViewModelFactory {
+    fun create(authorId: Int): PostViewModel
 }

@@ -10,9 +10,16 @@
         <action
             android:id="@+id/action_postDisplayFragment_to_savePostFragment"
             app:destination="@id/savePostFragment" />
+        <action
+            android:id="@+id/action_postDisplayFragment_to_userFragment"
+            app:destination="@id/userFragment" />
     </fragment>
     <fragment
         android:id="@+id/savePostFragment"
         android:name="ru.netology.nmedia.fragments.SavePostFragment"
         android:label="SavePostFragment" />
+    <fragment
+        android:id="@+id/userFragment"
+        android:name="ru.netology.nmedia.fragments.UserFragment"
+        android:label="UserFragment" />
 </navigation>

@@ -11,7 +11,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
 import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
-import ru.netology.nmedia.ApiService
 import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.FragmentSignUpBinding
 import ru.netology.nmedia.dto.Profile
@@ -38,8 +37,6 @@ class SignUpFragment : Fragment() {
     private val authViewModel:AuthViewModel by activityViewModels()
     @Inject
     lateinit var dataProfile:LiveData<Profile>
-    @Inject
-    lateinit var apiService:ApiService
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {

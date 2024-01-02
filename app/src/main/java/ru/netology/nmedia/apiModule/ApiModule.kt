@@ -8,7 +8,11 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import ru.netology.nmedia.ApiService
+import ru.netology.nmedia.AllEventsApiService
+import ru.netology.nmedia.AllPostApiService
+import ru.netology.nmedia.AuthApiService
+import ru.netology.nmedia.MyPostApiService
+import ru.netology.nmedia.UserPostApiService
 import javax.inject.Singleton
 
 @Module
@@ -17,13 +21,57 @@ object ApiModule {
     const val BASE_URL = "https://netomedia.ru/"
     @Provides
     @Singleton
-    fun provideService(): ApiService {
+    fun provideAuthService(): AuthApiService {
         return Retrofit.Builder().addConverterFactory(GsonConverterFactory.create())
             .baseUrl(BASE_URL).client(
             OkHttpClient.Builder().addInterceptor( HttpLoggingInterceptor()
                 .apply {
                         level = HttpLoggingInterceptor.Level.BODY
                 }).build()
-        ).build().create(ApiService::class.java)
+        ).build().create(AuthApiService::class.java)
+    }
+    @Provides
+    @Singleton
+    fun provideAllPostsService(): AllPostApiService {
+        return Retrofit.Builder().addConverterFactory(GsonConverterFactory.create())
+            .baseUrl(BASE_URL).client(
+                OkHttpClient.Builder().addInterceptor( HttpLoggingInterceptor()
+                    .apply {
+                        level = HttpLoggingInterceptor.Level.BODY
+                    }).build()
+            ).build().create(AllPostApiService::class.java)
+    }
+    @Provides
+    @Singleton
+    fun provideMyPostService(): MyPostApiService {
+        return Retrofit.Builder().addConverterFactory(GsonConverterFactory.create())
+            .baseUrl(BASE_URL).client(
+                OkHttpClient.Builder().addInterceptor( HttpLoggingInterceptor()
+                    .apply {
+                        level = HttpLoggingInterceptor.Level.BODY
+                    }).build()
+            ).build().create(MyPostApiService::class.java)
+    }
+    @Provides
+    @Singleton
+    fun provideAllEventService(): AllEventsApiService {
+        return Retrofit.Builder().addConverterFactory(GsonConverterFactory.create())
+            .baseUrl(BASE_URL).client(
+                OkHttpClient.Builder().addInterceptor( HttpLoggingInterceptor()
+                    .apply {
+                        level = HttpLoggingInterceptor.Level.BODY
+                    }).build()
+            ).build().create(AllEventsApiService::class.java)
+    }
+    @Provides
+    @Singleton
+    fun provideUserService(): UserPostApiService {
+        return Retrofit.Builder().addConverterFactory(GsonConverterFactory.create())
+            .baseUrl(BASE_URL).client(
+                OkHttpClient.Builder().addInterceptor( HttpLoggingInterceptor()
+                    .apply {
+                        level = HttpLoggingInterceptor.Level.BODY
+                    }).build()
+            ).build().create(UserPostApiService::class.java)
     }
 }

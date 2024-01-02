@@ -65,7 +65,7 @@ dependencies {
     def okhttplogging_version = "4.11.0"
     def coroutines_version = "1.7.3"
     def play_services_base_version = "18.1.0"
-    def hilt_version = "2.47"
+    def hilt_version = "2.50"
     def nav_version = "2.7.3"
     def paging_version = "3.2.0"
     implementation fileTree(dir: "libs", include: ["*.jar"])

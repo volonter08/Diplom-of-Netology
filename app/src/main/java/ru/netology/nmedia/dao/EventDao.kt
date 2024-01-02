@@ -7,7 +7,6 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import ru.netology.nmedia.entity.EventEntity
-import ru.netology.nmedia.entity.PostEntity
 @Dao
 interface EventDao {
     @Query("SELECT * FROM EventEntity ORDER BY id DESC")
@@ -27,6 +26,6 @@ interface EventDao {
 
     @Query("DELETE FROM EventEntity WHERE id = :id")
     suspend fun removeById(id: Int)
-    @Query("DELETE FROM PostEntity")
+    @Query("DELETE FROM EventEntity")
     suspend fun removeAll()
 }

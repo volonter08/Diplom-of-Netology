@@ -64,20 +64,6 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/exit"
-            style="@style/Widget.Material3.Button.IconButton.Filled"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:elevation="12dp"
-            app:cornerRadius="12dp"
-            app:icon="@drawable/baseline_exit_to_app_24"
-            app:iconSize="36dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-
-            />
-
         <FrameLayout
             android:id="@+id/progress_bar_layout"
             android:layout_width="match_parent"

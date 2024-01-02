@@ -12,9 +12,13 @@ import android.view.animation.LinearInterpolator
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.paging.LoadState
 import ru.netology.nmedia.OnButtonTouchListener
 import ru.netology.nmedia.adapter.ItemLoadingStateAdapter
@@ -22,6 +26,7 @@ import ru.netology.nmedia.databinding.FragmentPostDisplayBinding
 import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.viewModel.PostViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.lifecycle.withCreationCallback
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import ru.netology.nmedia.adapter.EventAdapter
@@ -30,14 +35,23 @@ import ru.netology.nmedia.dto.Event
 import ru.netology.nmedia.dto.Note
 import ru.netology.nmedia.model.ErrorCallback
 import ru.netology.nmedia.viewModel.EventViewModel
+import ru.netology.nmedia.viewModel.PostViewModelFactory
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class PostDisplayFragment : Fragment() {
     @Inject
     lateinit var errorCallback: ErrorCallback
-    private val postViewModel: PostViewModel by activityViewModels()
-    private val eventViewModel:EventViewModel by activityViewModels()
+
+    private val postViewModel: PostViewModel by viewModels<PostViewModel>(
+        extrasProducer = {
+            defaultViewModelCreationExtras.withCreationCallback<
+                    PostViewModelFactory> { factory ->
+                factory.create(-1)
+            }
+        }
+    )
+    private val eventViewModel: EventViewModel by activityViewModels()
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -47,7 +61,7 @@ class PostDisplayFragment : Fragment() {
         val onButtonTouchListener = object : OnButtonTouchListener {
             override fun onLikeCLick(likedNote: Note) {
                 likedNote.run {
-                    when (this){
+                    when (this) {
                         is Post -> postViewModel.like(this)
                         is Event -> eventViewModel.like(this)
                     }
@@ -56,7 +70,7 @@ class PostDisplayFragment : Fragment() {
 
             override fun onDislikeCLick(dislikedNote: Note) {
                 dislikedNote.run {
-                    when (this){
+                    when (this) {
                         is Post -> postViewModel.dislike(this)
                         is Event -> eventViewModel.dislike(this)
                     }
@@ -69,9 +83,9 @@ class PostDisplayFragment : Fragment() {
 
             override fun onRemoveClick(removedNote: Note) {
                 removedNote.run {
-                    when (this){
-                        is Post -> postViewModel.remove(this.id)
-                        is Event -> eventViewModel.remove(this.id)
+                    when (this) {
+                        is Post -> postViewModel.remove(removedNote as Post)
+                        is Event -> eventViewModel.remove(removedNote as Event)
                     }
                 }
             }
@@ -94,10 +108,10 @@ class PostDisplayFragment : Fragment() {
             }
         )
         viewBinding.postRecycleView.adapter = postAdapter.withLoadStateHeaderAndFooter(
-            header = ItemLoadingStateAdapter{
+            header = ItemLoadingStateAdapter {
                 postAdapter.retry()
             },
-            footer = ItemLoadingStateAdapter{
+            footer = ItemLoadingStateAdapter {
                 postAdapter.retry()
             }
         )
@@ -136,17 +150,17 @@ class PostDisplayFragment : Fragment() {
             feedModel.run {
                 viewBinding.progressBar.isVisible = loading
                 viewBinding.eventSwipeRefreshLayout.isRefreshing = isRefreshed
-                error?.let{
-                    errorCallback.onError(it.reason,it.onRetryListener)
+                error?.let {
+                    errorCallback.onError(it.reason, it.onRetryListener)
                 }
             }
         }
-        postViewModel.dataState.observe(viewLifecycleOwner){feedModel->
+        postViewModel.dataState.observe(viewLifecycleOwner) { feedModel ->
             feedModel.run {
                 viewBinding.progressBar.isVisible = loading
                 viewBinding.postSwipeRefreshLayout.isRefreshing = isRefreshed
-                error?.let{
-                    errorCallback.onError(it.reason,it.onRetryListener)
+                error?.let {
+                    errorCallback.onError(it.reason, it.onRetryListener)
                 }
             }
         }
@@ -180,8 +194,7 @@ class PostDisplayFragment : Fragment() {
                     interpolator = LinearInterpolator()
                 }.start()
                 viewBinding.postSwipeRefreshLayout.visibility = View.GONE
-            }
-            else{
+            } else {
                 viewBinding.postSwipeRefreshLayout.isVisible = !isChecked
                 ObjectAnimator.ofPropertyValuesHolder(
                     viewBinding.postSwipeRefreshLayout,

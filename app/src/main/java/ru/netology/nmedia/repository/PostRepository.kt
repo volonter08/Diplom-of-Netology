@@ -1,56 +1,23 @@
 package ru.netology.nmedia.repository
 
-import androidx.paging.ExperimentalPagingApi
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.PagingData
-import androidx.paging.map
+import androidx.room.withTransaction
 import com.google.gson.Gson
-import ru.netology.nmedia.ApiService
-import ru.netology.nmedia.dao.PostDao
-import ru.netology.nmedia.dao.PostRemoteKeyDao
+import ru.netology.nmedia.PostApiService
+import ru.netology.nmedia.dao.postDao.AllPostDao
+import ru.netology.nmedia.dao.postDao.PostDao
+import ru.netology.nmedia.dao.postDao.insert
 import ru.netology.nmedia.db.AppDb
 import ru.netology.nmedia.dto.Post
+import ru.netology.nmedia.entity.AllPostEntity
+import ru.netology.nmedia.entity.MyPostEntity
 import ru.netology.nmedia.entity.PostEntity
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
-import ru.netology.nmedia.dao.ProfileDao
-import ru.netology.nmedia.remoteMediator.PostRemoteMediator
 import ru.netology.nmedia.responses.ErrorResponse
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class PostRepository @Inject constructor(
-    appDb: AppDb,
-    private val dao: PostDao,
-    daoRemoteKey: PostRemoteKeyDao,
-    profileDao: ProfileDao,
-    val retrofitService: ApiService
-) : Repository<List<Post>> {
-
-    @OptIn(ExperimentalPagingApi::class)
-    val data: Flow<PagingData<Post>> = Pager(
-        config = PagingConfig(pageSize = 10, enablePlaceholders = false, initialLoadSize = 10),
-        remoteMediator = PostRemoteMediator(retrofitService, appDb, dao, daoRemoteKey, profileDao),
-        pagingSourceFactory = dao::pagingSource,
-    ).flow.map { pagingData ->
-        pagingData.map {
-            it.toDto()
-        }
-    }
-
-    override suspend fun getAll() {
-        val response = retrofitService.getAllPosts()
-        if (!response.isSuccessful)
-            throw Exception("Request is not successfu")
-        val listPosts = response.body() ?: emptyList()
-        dao.insert(listPosts.map {
-            PostEntity.fromDto(it)
-        })
-    }
-
-    suspend fun like(likedPost: Post, token: String?) {
+abstract class PostRepository constructor(
+    val appDb: AppDb? = null,
+    val retrofitService: PostApiService
+) : Repository<Post> {
+    override suspend fun like(likedPost: Post, token: String?) {
         val response = retrofitService.likePostById(likedPost.id, token)
         if (!response.isSuccessful) {
             val error: ErrorResponse? =
@@ -60,12 +27,16 @@ class PostRepository @Inject constructor(
                 )
             throw Exception(error?.reason)
         } else
-            response.body()?.let {
-                dao.insert(PostEntity.fromDto(it))
+            response.body()?.let { post ->
+                appDb?.withTransaction {
+                    appDb.allPostDao().update(AllPostEntity(post))
+                    appDb.myPostDao().update(MyPostEntity(post))
+                }
+
             }
     }
 
-    suspend fun dislike(dislikedPost: Post, token: String?) {
+    override suspend fun dislike(dislikedPost: Post, token: String?) {
         val response = retrofitService.dislikePostById(dislikedPost.id, token)
         if (!response.isSuccessful) {
             val error: ErrorResponse? =
@@ -74,24 +45,30 @@ class PostRepository @Inject constructor(
                     ErrorResponse::class.java
                 )
             throw Exception(error?.reason)
-        }
-        else
-            response.body()?.let {
-                dao.insert(PostEntity.fromDto(it))
+        } else
+            response.body()?.let { post ->
+                appDb?.withTransaction {
+                    appDb.allPostDao().update(AllPostEntity(post))
+                    appDb.myPostDao().update(MyPostEntity(post))
+                }
+
             }
     }
 
     fun share(id: Int) {
     }
 
-    suspend fun remove(id: Int, token: String?) {
-        dao.removeById(id)
-        val response = retrofitService.removePostById(id, token)
+    override suspend fun remove(post: Post, token: String?) {
+        appDb?.withTransaction {
+            appDb.allPostDao().remove(AllPostEntity(post))
+            appDb.myPostDao().remove(MyPostEntity(post))
+        }
+        val response = retrofitService.removePostById(post.id, token)
         if (!response.isSuccessful)
             throw Exception("Request is not successful")
     }
 
-    suspend fun createPost(content: String) {
+    override suspend fun createPost(content: String) {
         val response = retrofitService.savePost(
             Post(
                 id = 0,
@@ -105,15 +82,25 @@ class PostRepository @Inject constructor(
         )
         if (!response.isSuccessful)
             throw Exception("Request is not successful")
-        val createdPost = response.body()
-        dao.insert(PostEntity.fromDto(createdPost!!))
+        response.body()?.let {post->
+            appDb?.withTransaction {
+                appDb.allPostDao().insert(AllPostEntity(post))
+                appDb.myPostDao().insert(MyPostEntity(post))
+            }
+
+        }
     }
 
-    suspend fun update(post: Post) {
+    override suspend fun update(post: Post) {
         val response = retrofitService.savePost(post)
         if (!response.isSuccessful)
             throw Exception("Request is not successful")
-        val updatedPost = response.body()
-        dao.insert(PostEntity.fromDto(updatedPost!!))
+        response.body()?.let {post->
+            appDb?.withTransaction {
+                appDb.allPostDao().update(AllPostEntity(post))
+                appDb.myPostDao().update(MyPostEntity(post))
+            }
+
+        }
     }
 }

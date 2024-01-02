@@ -2,9 +2,7 @@ package ru.netology.nmedia.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.dto.Profile
-import ru.netology.nmedia.dto.User
 
 @Entity
 data class ProfileEntity(

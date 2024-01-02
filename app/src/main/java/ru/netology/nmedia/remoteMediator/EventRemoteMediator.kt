@@ -5,7 +5,7 @@ import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import androidx.room.withTransaction
-import ru.netology.nmedia.ApiService
+import ru.netology.nmedia.AllEventsApiService
 import ru.netology.nmedia.dao.EventDao
 import ru.netology.nmedia.dao.EventRemoteKeyDao
 import ru.netology.nmedia.dao.ProfileDao
@@ -13,13 +13,12 @@ import ru.netology.nmedia.db.AppDb
 import ru.netology.nmedia.entity.EventEntity
 import ru.netology.nmedia.entity.EventRemoteKeyEntity
 import ru.netology.nmedia.entity.KeyType
-import ru.netology.nmedia.entity.PostEntity
 import ru.netology.nmedia.entity.toEntity
 import javax.inject.Inject
 
 @OptIn(ExperimentalPagingApi::class)
 class EventRemoteMediator @Inject constructor(
-    private val service: ApiService,
+    private val service: AllEventsApiService,
     private val db: AppDb,
     private val eventDao: EventDao,
     private val eventRemoteKeyDao: EventRemoteKeyDao,

@@ -7,6 +7,11 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.Dispatchers
 import ru.netology.nmedia.auth.AppAuth
+import ru.netology.nmedia.dao.postDao.AllPostDao
+import ru.netology.nmedia.dao.postDao.MyPostDao
+import ru.netology.nmedia.dao.postDao.PostDao
+import ru.netology.nmedia.dao.postRemoteKeyDao.AllPostRemoteKeyDao
+import ru.netology.nmedia.dao.postRemoteKeyDao.MyPostRemoteKeyDao
 import ru.netology.nmedia.db.AppDb
 import ru.netology.nmedia.dto.Profile
 import javax.inject.Singleton
@@ -16,10 +21,16 @@ import javax.inject.Singleton
 object DaoModule {
     @Provides
     @Singleton
-    fun providePostDao(db: AppDb): PostDao = db.postDao()
+    fun provideAllPostDao(db: AppDb): AllPostDao = db.allPostDao()
     @Provides
     @Singleton
-    fun providePostRemoteKeyDao(db: AppDb): PostRemoteKeyDao = db.postRemoteKeyDao()
+    fun provideMyPostDao(db: AppDb): MyPostDao = db.myPostDao()
+    @Provides
+    @Singleton
+    fun provideAllPostRemoteKeyDao(db: AppDb): AllPostRemoteKeyDao = db.allPostRemoteKeyDao()
+    @Provides
+    @Singleton
+    fun provideMyPostRemoteKeyDao(db: AppDb): MyPostRemoteKeyDao = db.myPostRemoteKeyDao()
     @Provides
     @Singleton
     fun provideProfileDao(db:AppDb):ProfileDao = db.profileDao()

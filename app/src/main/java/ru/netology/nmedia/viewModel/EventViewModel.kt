@@ -73,13 +73,13 @@ class EventViewModel @Inject constructor(
             }
         }
     }
-    fun remove(id: Int) {
+    fun remove(event: Event) {
         viewModelScope.launch {
             try {
-                repository.remove(id,tokenAccess)
+                repository.remove(event,tokenAccess)
             } catch (_: Exception) {
                 onError("Request is not succesfull") {
-                    remove(id)
+                    remove(event)
                 }
             }
         }
