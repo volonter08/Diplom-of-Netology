@@ -14,4 +14,5 @@ import ru.netology.nmedia.repository.UserPostsRepository
 interface PostRepositoryEntryPoint {
     fun allPostRepository():AllPostsRepository
     fun myPostRepository():MyPostsRepository
+    fun userPostRepositoryFactory():UserPostRepositoryFactory
 }

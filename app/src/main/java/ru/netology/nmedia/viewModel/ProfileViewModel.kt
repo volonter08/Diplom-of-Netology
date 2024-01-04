@@ -23,22 +23,22 @@ class ProfileViewModel @Inject constructor(
     private val auth: AppAuth,
     val profileRepository: ProfileRepository,
 ) : ViewModel() {
-    val _dataState = MutableLiveData(FeedModelState())
-    val dataProfile = auth.authStateFlow.map {
-        User(it.id, it.login, it.name, it.avatar)
-    }.asLiveData(Dispatchers.Default)
+    private val _dataState = MutableLiveData(FeedModelState())
+    private val _dataProfile = MutableLiveData<User>()
     val dataState: LiveData<FeedModelState>
         get() {
             return _dataState
+        }
+    val dataProfile: LiveData<User>
+        get() {
+            return _dataProfile
         }
 
     fun initUserData(id: String) {
         viewModelScope.launch {
             try {
                 _dataState.value = FeedModelState(true)
-                profileRepository.getUserData(id)?.also {
-                    auth.updateUserData(it.id, it.login, it.name, it.avatar)
-                }
+                _dataProfile.value = profileRepository.getUserData(id)
                 _dataState.value = FeedModelState()
             } catch (e: Exception) {
                 onError(e.message) {

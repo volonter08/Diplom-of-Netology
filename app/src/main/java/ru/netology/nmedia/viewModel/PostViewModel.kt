@@ -29,8 +29,9 @@ import ru.netology.nmedia.repository.Repository
 import ru.netology.nmedia.repository.UserPostRepositoryFactory
 import ru.netology.nmedia.responses.Error
 import javax.inject.Inject
+
 @HiltViewModel(assistedFactory = PostViewModelFactory::class)
-class PostViewModel  @AssistedInject constructor(
+class PostViewModel @AssistedInject constructor(
     @Assisted
     val authorId: Int,
     @ApplicationContext context: Context,
@@ -38,36 +39,42 @@ class PostViewModel  @AssistedInject constructor(
 ) : ViewModel() {
 
 
-    val entryPoint:PostRepositoryEntryPoint = EntryPointAccessors.fromApplication(context,PostRepositoryEntryPoint::class.java)
-    val repository:PostRepository = when( authorId){
-        0-> entryPoint.myPostRepository()
+    val entryPoint: PostRepositoryEntryPoint =
+        EntryPointAccessors.fromApplication(context, PostRepositoryEntryPoint::class.java)
+    val repository: PostRepository = when (authorId) {
+        0 -> entryPoint.myPostRepository()
         -1 -> entryPoint.allPostRepository()
-        else -> entryPoint.myPostRepository()
+        else -> entryPoint.userPostRepositoryFactory().create(authorId)
     }
     private val cached = repository
         .data
         .cachedIn(viewModelScope)
 
-    var tokenAccess:String? = null
+    var tokenAccess: String? = null
     val data: Flow<PagingData<Post>> = auth.authStateFlow
         .flatMapLatest { (myId, token, _, _, _) ->
-            tokenAccess= token
+            tokenAccess = token
             cached.map { pagingData ->
                 pagingData.map { post ->
-                    post.copy(ownedByMe = post.authorId == myId,likedByMe = post.likeOwnerIds.contains(myId))
+
+                    post.copy(
+                        ownedByMe = post.authorId == myId,
+                        likedByMe = post.likeOwnerIds.contains(myId),
+                    )
                 }
             }
         }
     val _dataState: MutableLiveData<ru.netology.nmedia.FeedModelState> = MutableLiveData()
     val dataState: LiveData<ru.netology.nmedia.FeedModelState>
         get() = _dataState
+
     fun like(likedPost: Post) {
         viewModelScope.launch {
             try {
-                repository.like(likedPost,tokenAccess)
+                repository.like(likedPost, tokenAccess)
                 _dataState.setValue(FeedModelState())
             } catch (e: Exception) {
-                onError(e.message?:"") {
+                onError(e.message ?: "") {
                     like(likedPost)
                 }
             }
@@ -77,10 +84,10 @@ class PostViewModel  @AssistedInject constructor(
     fun dislike(disLikedPost: Post) {
         viewModelScope.launch {
             try {
-                repository.dislike(dislikedPost = disLikedPost, tokenAccess )
+                repository.dislike(dislikedPost = disLikedPost, tokenAccess)
                 _dataState.setValue(FeedModelState())
             } catch (e: Exception) {
-                onError(e.message?:"") {
+                onError(e.message ?: "") {
                     dislike(disLikedPost)
                 }
             }
@@ -94,7 +101,7 @@ class PostViewModel  @AssistedInject constructor(
     fun remove(post: Post) {
         viewModelScope.launch {
             try {
-                repository.remove(post,tokenAccess)
+                repository.remove(post, tokenAccess)
             } catch (_: Exception) {
                 onError("Request is not succesfull") {
                     remove(post)
@@ -132,6 +139,7 @@ class PostViewModel  @AssistedInject constructor(
         _dataState.value = FeedModelState()
     }
 }
+
 @AssistedFactory
 interface PostViewModelFactory {
     fun create(authorId: Int): PostViewModel

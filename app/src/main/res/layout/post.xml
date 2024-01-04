@@ -4,8 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@drawable/border_item_post"
     android:padding="15dp"
-    android:theme="@style/ThemeOverlay.App">
+    android:theme="@style/ThemeOverlay.App"
+    android:layout_marginBottom="12dp"
+    >
 
     <ImageView
         android:id="@+id/avatar"
@@ -66,7 +69,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/barrier"
-        app:layout_constraintBottom_toTopOf="@id/attachment"
         android:lineSpacingExtra="@dimen/lineSpacingExtra"
         android:layout_marginTop="10dp"
         />
@@ -76,16 +78,26 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@id/link"
+        />
+    <TextView
+        android:autoLink="web"
+        android:id = "@+id/link"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/content"
+        android:lineSpacingExtra="@dimen/lineSpacingExtra"
+        android:layout_marginTop="10dp"
         />
     <androidx.constraintlayout.widget.Barrier
         android:id = "@+id/barrier2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:constraint_referenced_ids="attachment"
+        app:constraint_referenced_ids="link"
         app:barrierDirection="bottom"
         app:barrierMargin="14dp"
         />
+
     <com.google.android.material.button.MaterialButton
         android:id="@+id/like"
         style="@style/Widget.App.TextButton.Like"
@@ -109,27 +121,4 @@
         app:layout_constraintTop_toBottomOf="@id/barrier2"
         app:layout_constraintStart_toEndOf="@id/like"
         />
-    <TextView
-        android:id = "@+id/countViews"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:maxLines="1"
-        app:layout_constraintTop_toTopOf="@id/views"
-        app:layout_constraintBottom_toBottomOf="@id/views"
-        app:layout_constraintEnd_toEndOf="parent"
-        tools:text = "@sample/sample.json/data/countViews"
-        />
-    <ImageButton
-        android:id="@+id/views"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/baseline_remove_red_eye_24"
-        android:background="@android:color/transparent"
-        android:layout_marginTop="14dp"
-        android:layout_marginStart="14dp"
-        android:layout_marginEnd="4dp"
-        app:layout_constraintTop_toBottomOf="@id/barrier2"
-        app:layout_constraintEnd_toStartOf="@id/countViews"
-        />
-
 </androidx.constraintlayout.widget.ConstraintLayout>

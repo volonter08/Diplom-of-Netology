@@ -1,11 +1,40 @@
 package ru.netology.nmedia.fragments
 
+import android.graphics.drawable.AnimatedImageDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
+import androidx.paging.LoadState
+import com.bumptech.glide.Glide
+import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.lifecycle.withCreationCallback
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
+import ru.netology.nmedia.OnButtonTouchListener
 import ru.netology.nmedia.R
+import ru.netology.nmedia.adapter.PostAdapter
+import ru.netology.nmedia.databinding.FragmentProfileBinding
+import ru.netology.nmedia.databinding.FragmentUserBinding
+import ru.netology.nmedia.dto.Event
+import ru.netology.nmedia.dto.Note
+import ru.netology.nmedia.dto.Post
+import ru.netology.nmedia.dto.User
+import ru.netology.nmedia.model.ErrorCallback
+import ru.netology.nmedia.viewModel.PostViewModel
+import ru.netology.nmedia.viewModel.PostViewModelFactory
+import ru.netology.nmedia.viewModel.ProfileViewModel
+import javax.inject.Inject
+import kotlin.properties.Delegates
+
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 private const val ARG_PARAM1 = "param1"
@@ -17,25 +46,134 @@ private const val ARG_PARAM2 = "param2"
  * Use the [UserFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
+@AndroidEntryPoint
 class UserFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+    @Inject
+    lateinit var errorCallback: ErrorCallback
 
+    // TODO: Rename and change types of parameters
+    var userId by Delegates.notNull<Int>()
+    private lateinit var userFragmentBinding: FragmentUserBinding
+    private val postViewModel: PostViewModel by viewModels<PostViewModel>(
+        extrasProducer = {
+            defaultViewModelCreationExtras.withCreationCallback<
+                    PostViewModelFactory> { factory ->
+                factory.create(userId)
+            }
+        }
+    )
+    private val profileViewModel: ProfileViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
+            userId = it.getInt("user_id")
         }
+        profileViewModel.initUserData(userId.toString())
     }
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        userFragmentBinding = FragmentUserBinding.inflate(inflater, container, false)
+
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_user, container, false)
+        val onButtonTouchListener = object : OnButtonTouchListener {
+            override fun onLikeCLick(likedNote: Note) {
+                likedNote.run {
+                    when (this) {
+                        is Post -> postViewModel.like(this)
+                        is Event -> {}
+                    }
+                }
+            }
+
+            override fun onDislikeCLick(dislikedNote: Note) {
+                dislikedNote.run {
+                    when (this) {
+                        is Post -> postViewModel.dislike(this)
+                        is Event -> {}
+                    }
+                }
+            }
+
+            override fun onShareCLick(note: Note) {
+
+            }
+
+            override fun onRemoveClick(removedNote: Note) {
+                removedNote.run {
+                    when (this) {
+                        is Post -> postViewModel.remove(removedNote as Post)
+                        is Event -> {}
+                    }
+                }
+            }
+
+            override fun onUpdateCLick(note: Note) {
+
+            }
+
+            override fun onCreateClick() {
+            }
+
+            override fun onPostAuthorClick(authorId: Int) {
+            }
+        }
+        val postAdapter = PostAdapter(context = requireContext(), onButtonTouchListener)
+        val userFragmentBinding = FragmentUserBinding.inflate(layoutInflater, container, false)
+        userFragmentBinding.postRecycleView.adapter = postAdapter
+        profileViewModel.dataProfile.observe(viewLifecycleOwner) {
+            userFragmentBinding.login.text = String.format(getString(R.string.login), it.login)
+            userFragmentBinding.name.text = String.format(getString(R.string.name), it.name)
+            val animPlaceHolder =
+                requireContext().getDrawable(R.drawable.loading_avatar) as AnimatedImageDrawable
+            animPlaceHolder.start()// probably needed
+            Glide.with(requireContext()).load(it?.avatar).circleCrop()
+                .placeholder(animPlaceHolder)
+                .timeout(10_000).error(R.drawable.null_avatar)
+                .into(userFragmentBinding.profileAvatar)
+        }
+        profileViewModel.dataState.observe(viewLifecycleOwner) {
+            userFragmentBinding.progressBarLayout.isVisible = it.loading
+            it.error?.let {
+                errorCallback.onError(it.reason, it.onRetryListener)
+            }
+        }
+        postViewModel.dataState.observe(viewLifecycleOwner) { feedModel ->
+            feedModel.run {
+                userFragmentBinding.postSwipeRefreshLayout.isRefreshing = isRefreshed
+                error?.let {
+                    errorCallback.onError(it.reason, it.onRetryListener)
+                }
+            }
+        }
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                postViewModel.data.collectLatest {
+                    postAdapter.submitData(it)
+                    userFragmentBinding.emptyMyPostListText.isVisible = postAdapter.itemCount == 0
+                }
+            }
+        }
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                postViewModel.auth.authStateFlow.collectLatest {
+                    postAdapter.refresh()
+                }
+            }
+        }
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                postAdapter.loadStateFlow.collectLatest { state ->
+                    userFragmentBinding.postSwipeRefreshLayout.isRefreshing =
+                        state.refresh is LoadState.Loading
+                }
+            }
+        }
+        userFragmentBinding.postSwipeRefreshLayout.setOnRefreshListener(postAdapter::refresh)
+        return userFragmentBinding.root
     }
 
     companion object {
@@ -52,8 +190,8 @@ class UserFragment : Fragment() {
         fun newInstance(param1: String, param2: String) =
             UserFragment().apply {
                 arguments = Bundle().apply {
-                    putString(ru.netology.nmedia.entity.ARG_PARAM1, param1)
-                    putString(ru.netology.nmedia.entity.ARG_PARAM2, param2)
+                    putString(ARG_PARAM1, param1)
+                    putString(ARG_PARAM2, param2)
                 }
             }
     }

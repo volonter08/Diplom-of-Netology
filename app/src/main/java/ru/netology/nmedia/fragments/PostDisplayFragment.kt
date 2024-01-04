@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.view.ViewPropertyAnimator
 import android.view.animation.LayoutAnimationController
 import android.view.animation.LinearInterpolator
+import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -19,6 +20,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.viewmodel.CreationExtras
+import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
 import ru.netology.nmedia.OnButtonTouchListener
 import ru.netology.nmedia.adapter.ItemLoadingStateAdapter
@@ -29,10 +31,12 @@ import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import ru.netology.nmedia.R
 import ru.netology.nmedia.adapter.EventAdapter
 import ru.netology.nmedia.adapter.PostAdapter
 import ru.netology.nmedia.dto.Event
 import ru.netology.nmedia.dto.Note
+import ru.netology.nmedia.dto.User
 import ru.netology.nmedia.model.ErrorCallback
 import ru.netology.nmedia.viewModel.EventViewModel
 import ru.netology.nmedia.viewModel.PostViewModelFactory
@@ -95,6 +99,12 @@ class PostDisplayFragment : Fragment() {
             }
 
             override fun onCreateClick() {
+            }
+
+            override fun onPostAuthorClick(authorId:Int) {
+                findNavController().navigate(R.id.action_postDisplayFragment_to_userFragment,
+                    bundleOf("user_id" to authorId)
+                )
             }
         }
         val postAdapter = PostAdapter(context = requireContext(), onButtonTouchListener)

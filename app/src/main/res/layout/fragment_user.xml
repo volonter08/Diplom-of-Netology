@@ -11,18 +11,6 @@
         android:padding="16dp"
         tools:context="ru.netology.nmedia.fragments.ProfileFragment">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginVertical="20dp"
-            android:fontFamily="sans-serif-black"
-            android:text="@string/my_profile"
-            android:textSize="40sp"
-            app:layout_constraintBottom_toTopOf="@id/profile_avatar"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
         <ImageView
             android:id="@+id/profile_avatar"
             android:layout_width="200dp"

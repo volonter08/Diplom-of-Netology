@@ -52,7 +52,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@drawable/border_post"
-            android:padding="8dp"
+            android:padding="20dp"
             tools:layout_editor_absoluteX="-83dp"
             tools:layout_editor_absoluteY="0dp">
 

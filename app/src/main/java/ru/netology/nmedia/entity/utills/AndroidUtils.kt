@@ -3,6 +3,9 @@ package com.example.netologyandroidhomework1
 import android.content.Context
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import retrofit2.http.Url
+import java.net.MalformedURLException
+import java.net.URL
 
 class AndroidUtils {
     companion object {

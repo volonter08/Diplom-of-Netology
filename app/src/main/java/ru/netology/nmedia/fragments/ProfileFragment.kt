@@ -50,13 +50,16 @@ private const val AVATAR = "avatar"
 class ProfileFragment : Fragment() {
     @Inject
     lateinit var errorCallback: ErrorCallback
+
     @Inject
-    lateinit var dataProfile:LiveData<Profile>
+    lateinit var dataMyProfile: LiveData<Profile>
+
     // TODO: Rename and change types of parameters
     private var login: String? = null
     private var name: String? = null
     private var avatar: String? = null
-    private val profileViewModel:ProfileViewModel by activityViewModels()
+    private val profileViewModel: ProfileViewModel by viewModels()
+    private val authViewModel: AuthViewModel by activityViewModels()
     private val postViewModel: PostViewModel by viewModels<PostViewModel>(
         extrasProducer = {
             defaultViewModelCreationExtras.withCreationCallback<
@@ -65,7 +68,6 @@ class ProfileFragment : Fragment() {
             }
         }
     )
-    private val authViewModel: AuthViewModel by activityViewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -76,6 +78,7 @@ class ProfileFragment : Fragment() {
             avatar = it.getString(AVATAR)
         }
     }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -118,36 +121,45 @@ class ProfileFragment : Fragment() {
 
             override fun onCreateClick() {
             }
+
+            override fun onPostAuthorClick(authorId: Int) {
+                TODO("Not yet implemented")
+            }
+
         }
+        val profileFragmentBinding =
+            FragmentProfileBinding.inflate(layoutInflater, container, false)
         val postAdapter = PostAdapter(context = requireContext(), onButtonTouchListener)
-        dataProfile.observe(viewLifecycleOwner){
-            if(it.id == 0 && it.token == null){
+        dataMyProfile.observe(viewLifecycleOwner) {
+            if (it.id == 0 && it.token == null) {
                 findNavController().navigate(R.id.action_profileFragment_to_signInFragment)
-            }
-            else if ( it.login==null && it.name==null && it.avatar==null){
+            } else if (it.login == null && it.name == null && it.avatar == null) {
                 profileViewModel.initUserData(it.id.toString())
-            }
-            else{
+            } else {
+                profileFragmentBinding.login.text =
+                    String.format(getString(R.string.login), it.login)
+                profileFragmentBinding.name.text = String.format(getString(R.string.name), it.name)
+                val animPlaceHolder =
+                    requireContext().getDrawable(R.drawable.loading_avatar) as AnimatedImageDrawable
+                animPlaceHolder.start()// probably needed
+                Glide.with(requireContext()).load(it.avatar).circleCrop()
+                    .placeholder(animPlaceHolder).timeout(10_000).error(R.drawable.null_avatar)
+                    .into(profileFragmentBinding.profileAvatar)
                 postAdapter.refresh()
             }
         }
-        val profileFragmentBinding = FragmentProfileBinding.inflate(layoutInflater,container,false)
-        profileFragmentBinding.postRecycleView.adapter= postAdapter
-        profileViewModel.dataProfile.observe(viewLifecycleOwner){
-            profileFragmentBinding.login.text = String.format(getString(R.string.login),it.login)
-            profileFragmentBinding.name.text = String.format(getString(R.string.name),it.name)
-            val animPlaceHolder =  requireContext().getDrawable(R.drawable.loading_avatar) as AnimatedImageDrawable
-            animPlaceHolder.start()// probably needed
-            Glide.with(requireContext()).load(it.avatar).circleCrop().placeholder(animPlaceHolder).timeout(10_000).error(R.drawable.null_avatar).into(profileFragmentBinding.profileAvatar)
+        profileFragmentBinding.postRecycleView.adapter = postAdapter
+        profileViewModel.dataProfile.observe(viewLifecycleOwner) {
+            authViewModel.updateUserData(it)
         }
-        profileViewModel.dataState.observe(viewLifecycleOwner){
+        profileViewModel.dataState.observe(viewLifecycleOwner) {
             profileFragmentBinding.progressBarLayout.isVisible = it.loading
-            it.error?.let{
-                errorCallback.onError(it.reason,it.onRetryListener)
+            it.error?.let {
+                errorCallback.onError(it.reason, it.onRetryListener)
             }
         }
         profileFragmentBinding.exit.setOnClickListener {
-            profileViewModel.exit {
+            authViewModel.exit {
                 findNavController().navigate(R.id.action_profileFragment_to_signInFragment)
             }
         }
@@ -155,7 +167,8 @@ class ProfileFragment : Fragment() {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 postViewModel.data.collectLatest {
                     postAdapter.submitData(it)
-                    profileFragmentBinding.emptyMyPostListText.isVisible = postAdapter.itemCount ==0
+                    profileFragmentBinding.emptyMyPostListText.isVisible =
+                        postAdapter.itemCount == 0
                 }
             }
         }
@@ -189,12 +202,12 @@ class ProfileFragment : Fragment() {
          */
         // TODO: Rename and change types and number of parameters
         @JvmStatic
-        fun newInstance(login: String, name: String,avatar:String) =
+        fun newInstance(login: String, name: String, avatar: String) =
             ProfileFragment().apply {
                 arguments = Bundle().apply {
                     putString(LOGIN, login)
                     putString(NAME, name)
-                    putString(AVATAR,avatar)
+                    putString(AVATAR, avatar)
                 }
             }
     }

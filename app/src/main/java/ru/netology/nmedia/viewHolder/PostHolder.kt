@@ -5,17 +5,21 @@ import android.content.Context
 import android.graphics.drawable.AnimatedImageDrawable
 import android.net.Uri
 import android.os.Build
+import android.text.Html
+import android.text.method.LinkMovementMethod
 import android.view.View
 import android.widget.PopupMenu
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.example.netologyandroidhomework1.AndroidUtils
 import ru.netology.nmedia.OnButtonTouchListener
 import ru.netology.nmedia.R
 import ru.netology.nmedia.apiModule.ApiModule.BASE_URL
 import ru.netology.nmedia.databinding.PostBinding
 import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.entity.utills.ConverterCountFromIntToString
+import java.net.URL
 
 
 class PostHolder(
@@ -35,6 +39,12 @@ class PostHolder(
                 animPlaceholder.start() // probably needed
                 Glide.with(context).load(Uri.parse(post.authorAvatar)).placeholder(animPlaceholder)
                     .error(R.drawable.null_avatar).timeout(10_000).circleCrop().into(it)
+            }
+            else {
+                it.setImageResource(R.drawable.null_avatar)
+            }
+            it.setOnClickListener {
+                listener.onPostAuthorClick(post.authorId)
             }
         }
         binding.attachment.also {
@@ -69,6 +79,12 @@ class PostHolder(
                     setForceShowIcon(true)
 
             }.show()
+        }
+        post.link?.let {
+            binding.link.apply {
+                text = it
+                isVisible = urls.isNotEmpty()
+            }
         }
         likeButton.setOnClickListener {
             if (!post.likedByMe)

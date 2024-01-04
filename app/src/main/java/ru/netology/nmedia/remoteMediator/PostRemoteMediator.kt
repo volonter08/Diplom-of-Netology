@@ -81,9 +81,7 @@ class PostRemoteMediator<T : PostEntity, V : PostRemoteKeyEntity> @Inject constr
             if (!response.isSuccessful) {
                 throw Exception()
             }
-            val body = (response.body() ?: throw Exception())
-            if(t.isAssignableFrom(MyPostEntity::class.java))
-                println("")
+            val body = (response.body()?: throw Exception())
             if (body.isNotEmpty()) {
                 db.withTransaction {
                     when (loadType) {
@@ -189,7 +187,7 @@ class PostRemoteMediator<T : PostEntity, V : PostRemoteKeyEntity> @Inject constr
                 return MediatorResult.Success(endOfPaginationReached = false)
             }
             else{
-                return MediatorResult.Success(endOfPaginationReached = true)
+                return MediatorResult.Success(endOfPaginationReached = false)
             }
         } catch (e: Exception) {
             return MediatorResult.Error(e)

@@ -33,7 +33,6 @@ class AppAuth @Inject constructor(
         fun authApiService(): AuthApiService
     }
     suspend fun setAuth(id:Int = 0,token:String? = null) {
-        println("Auth")
         profileDao.insert(ProfileEntity(ProfileData.PROFILE,id=id,token=token))
     }
     suspend fun updateUserData(id: Int,login:String?,name:String?,avatar:String?){

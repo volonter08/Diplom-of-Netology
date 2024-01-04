@@ -12,6 +12,7 @@ import okhttp3.FormBody
 import ru.netology.nmedia.AuthApiService
 import ru.netology.nmedia.FeedModelState
 import ru.netology.nmedia.OnRetryListener
+import ru.netology.nmedia.dto.User
 import ru.netology.nmedia.exceptions.AuthException
 import ru.netology.nmedia.requests.AuthenticationRequest
 import ru.netology.nmedia.responses.Error
@@ -81,6 +82,33 @@ class AuthViewModel @Inject constructor(
                 }
             }
         }
+    }
+    fun updateUserData(user: User) {
+        viewModelScope.launch {
+            try {
+                _dataState.value = FeedModelState(true)
+                auth.updateUserData(user.id, user.login, user.name, user.avatar)
+                _dataState.value = FeedModelState()
+            } catch (e: java.lang.Exception) {
+                onError(e.message) {
+                    updateUserData(user)
+                }
+            }
+        }
+    }
+    fun exit(onSuccessfulExit: () -> Unit) {
+        viewModelScope.launch {
+            try {
+                _dataState.value = FeedModelState(true)
+                auth.setAuth()
+                _dataState.value = FeedModelState()
+            } catch (e: java.lang.Exception) {
+                onError(e.message) {
+                    exit(onSuccessfulExit)
+                }
+            }
+        }
+
     }
     private fun onError(reason:String?,onRetryListener: OnRetryListener){
         _dataState.value = FeedModelState(error= Error(reason,onRetryListener))

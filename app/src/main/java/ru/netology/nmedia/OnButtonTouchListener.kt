@@ -10,4 +10,5 @@ interface OnButtonTouchListener {
     fun onRemoveClick(removedNote:Note)
     fun onUpdateCLick(note: Note)
     fun onCreateClick()
+    fun onPostAuthorClick(authorId:Int)
 }
