@@ -2,6 +2,7 @@ package ru.netology.nmedia.dto
 
 import ru.netology.nmedia.entity.PostEntity
 import ru.netology.nmedia.model.Attachment
+import java.io.Serializable
 
 data class Post(
     override val id: Int,
@@ -20,4 +21,4 @@ data class Post(
     override val attachment: Attachment? = null,
     override val ownedByMe: Boolean = false,
     override val users: Map<String,UserPreview> = emptyMap(),
-): Note
+): Serializable,Note

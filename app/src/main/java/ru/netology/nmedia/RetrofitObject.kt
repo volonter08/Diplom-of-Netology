@@ -10,6 +10,7 @@ import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
+import ru.netology.nmedia.activity.PostCreateRequest
 import ru.netology.nmedia.dto.Event
 import ru.netology.nmedia.dto.User
 import ru.netology.nmedia.requests.AuthenticationRequest
@@ -51,7 +52,7 @@ interface PostApiService {
 
     //CRUD posts
     @POST("api/posts")
-    suspend fun savePost(@Body post: Post): Response<Post>
+    suspend fun savePost(@Body post: PostCreateRequest,@Header("Authorization") token: String?): Response<Post>
 
     @DELETE("api/posts/{id}")
     suspend fun removePostById(

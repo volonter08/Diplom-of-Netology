@@ -11,7 +11,6 @@ import androidx.paging.map
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
-import dagger.hilt.EntryPoints
 import dagger.hilt.android.EntryPointAccessors
 import ru.netology.nmedia.OnRetryListener
 import ru.netology.nmedia.auth.AppAuth
@@ -25,17 +24,16 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import ru.netology.nmedia.FeedModelState
 import ru.netology.nmedia.PostRepositoryEntryPoint
-import ru.netology.nmedia.repository.Repository
-import ru.netology.nmedia.repository.UserPostRepositoryFactory
+import ru.netology.nmedia.dao.ProfileDao
 import ru.netology.nmedia.responses.Error
-import javax.inject.Inject
 
 @HiltViewModel(assistedFactory = PostViewModelFactory::class)
 class PostViewModel @AssistedInject constructor(
     @Assisted
     val authorId: Int,
     @ApplicationContext context: Context,
-    val auth: AppAuth
+    val auth: AppAuth,
+    val profileDao: ProfileDao
 ) : ViewModel() {
 
 
@@ -50,13 +48,10 @@ class PostViewModel @AssistedInject constructor(
         .data
         .cachedIn(viewModelScope)
 
-    var tokenAccess: String? = null
     val data: Flow<PagingData<Post>> = auth.authStateFlow
         .flatMapLatest { (myId, token, _, _, _) ->
-            tokenAccess = token
             cached.map { pagingData ->
                 pagingData.map { post ->
-
                     post.copy(
                         ownedByMe = post.authorId == myId,
                         likedByMe = post.likeOwnerIds.contains(myId),
@@ -71,7 +66,7 @@ class PostViewModel @AssistedInject constructor(
     fun like(likedPost: Post) {
         viewModelScope.launch {
             try {
-                repository.like(likedPost, tokenAccess)
+                repository.like(likedPost, profileDao.getAccessToken())
                 _dataState.setValue(FeedModelState())
             } catch (e: Exception) {
                 onError(e.message ?: "") {
@@ -84,7 +79,7 @@ class PostViewModel @AssistedInject constructor(
     fun dislike(disLikedPost: Post) {
         viewModelScope.launch {
             try {
-                repository.dislike(dislikedPost = disLikedPost, tokenAccess)
+                repository.dislike(dislikedPost = disLikedPost, profileDao.getAccessToken())
                 _dataState.setValue(FeedModelState())
             } catch (e: Exception) {
                 onError(e.message ?: "") {
@@ -101,22 +96,24 @@ class PostViewModel @AssistedInject constructor(
     fun remove(post: Post) {
         viewModelScope.launch {
             try {
-                repository.remove(post, tokenAccess)
-            } catch (_: Exception) {
-                onError("Request is not succesfull") {
+                repository.remove(post, profileDao.getAccessToken())
+            } catch (e: Exception) {
+                onError(e.message?:"") {
                     remove(post)
                 }
             }
         }
     }
 
-    fun createPost(content: String) {
+    fun createPost(content: String,link:String?=null) {
         viewModelScope.launch {
             try {
-                repository.createPost(content)
-            } catch (_: Exception) {
-                onError("Request is not succesfull") {
-                    createPost(content)
+                _dataState.value = FeedModelState(loading = true)
+                repository.createPost(content, link,profileDao.getAccessToken())
+                _dataState.value = FeedModelState(isPostCreated = true)
+            } catch (e: Exception) {
+                onError(e.message?:"") {
+                    createPost(content,link)
                 }
             }
         }
@@ -125,9 +122,9 @@ class PostViewModel @AssistedInject constructor(
     fun update(post: Post) {
         viewModelScope.launch {
             try {
-                repository.update(post)
-            } catch (_: Exception) {
-                onError("Request is not succesfull") {
+                repository.update(post,profileDao.getAccessToken())
+            } catch (e: Exception) {
+                onError(e.message?:"") {
                     update(post)
                 }
             }

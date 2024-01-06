@@ -81,11 +81,11 @@ class EventRepository @Inject constructor(
             throw Exception("Request is not successful")
     }
 
-    override suspend fun createPost(content: String) {
+    override suspend fun createPost(content: String, link: String?, token: String?) {
         TODO("Not yet implemented")
     }
 
-    override suspend fun update(post: Post) {
+    override suspend fun update(post: Post,token: String?) {
         TODO("Not yet implemented")
     }
     /*

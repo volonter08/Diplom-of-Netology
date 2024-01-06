@@ -9,7 +9,9 @@
         android:label="PostDisplayFragment">
         <action
             android:id="@+id/action_postDisplayFragment_to_savePostFragment"
-            app:destination="@id/savePostFragment" />
+            app:destination="@id/savePostFragment"
+            app:restoreState="true"
+            />
         <action
             android:id="@+id/action_postDisplayFragment_to_userFragment"
             app:destination="@id/userFragment" />

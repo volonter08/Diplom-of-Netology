@@ -4,13 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#DEE8FC"
-    tools:context=".activity.PostEditAndCreateActivity">
+    android:background="#DEE8FC">
+
     <LinearLayout
+        android:id="@+id/main_layout_save_post"
         android:layout_width="match_parent"
         android:layout_height="300dp"
         android:layout_gravity="center_vertical"
         android:orientation="vertical">
+
         <LinearLayout
             android:id="@+id/linearLayoutUpdate"
             android:layout_width="match_parent"
@@ -40,6 +42,7 @@
                     android:text="@string/edit_content"
                     android:textColor="@color/purple_700"
                     android:textSize="15sp" />
+
                 <TextView
                     android:id="@+id/update_content_text"
                     android:layout_width="match_parent"
@@ -60,6 +63,7 @@
                 android:background="@android:color/transparent"
                 android:src="@drawable/baseline_cancel_24" />
         </LinearLayout>
+
         <RelativeLayout
             android:id="@+id/inputLayout"
             android:layout_width="match_parent"
@@ -67,16 +71,36 @@
             android:background="@drawable/drawableforinputlayout"
             app:layout_constraintStart_toStartOf="parent">
 
-            <EditText
-                android:id="@+id/editText"
-                android:layout_width="0dp"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
                 android:layout_alignParentEnd="true"
                 android:layout_centerHorizontal="true"
                 android:layout_marginHorizontal="30dp"
-                android:layout_marginTop="20dp"
-                android:background="@android:color/transparent" />
+                android:orientation="vertical"
+                android:layout_marginTop="20dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Content:"
+                    />
+                <EditText
+                    android:id="@+id/content_edit_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Link:"
+                    />
+                <EditText
+                    android:id="@+id/link_edit_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp" />
+            </LinearLayout>
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/save"
                 style="@style/Widget.App.SaveOrCreateButton"
@@ -89,4 +113,11 @@
                 android:visibility="visible" />
         </RelativeLayout>
     </LinearLayout>
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone"
+        />
 </FrameLayout>

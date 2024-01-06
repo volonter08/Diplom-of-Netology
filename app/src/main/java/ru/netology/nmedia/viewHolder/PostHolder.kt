@@ -1,25 +1,21 @@
 package ru.netology.nmedia.viewHolder
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.drawable.AnimatedImageDrawable
 import android.net.Uri
 import android.os.Build
-import android.text.Html
-import android.text.method.LinkMovementMethod
-import android.view.View
 import android.widget.PopupMenu
 import androidx.core.view.isVisible
+import androidx.media3.common.MediaItem
+import androidx.media3.exoplayer.ExoPlayer
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.example.netologyandroidhomework1.AndroidUtils
 import ru.netology.nmedia.OnButtonTouchListener
 import ru.netology.nmedia.R
-import ru.netology.nmedia.apiModule.ApiModule.BASE_URL
 import ru.netology.nmedia.databinding.PostBinding
 import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.entity.utills.ConverterCountFromIntToString
-import java.net.URL
+import ru.netology.nmedia.enumeration.AttachmentType
 
 
 class PostHolder(
@@ -28,7 +24,9 @@ class PostHolder(
     val listener: OnButtonTouchListener
 ) : RecyclerView.ViewHolder(binding.root) {
 
-    @SuppressLint("UseCompatLoadingForDrawables")
+    init{
+
+    }
     fun bind(post: Post) {
         val likeButton = binding.like
         val shareButton = binding.share
@@ -39,23 +37,14 @@ class PostHolder(
                 animPlaceholder.start() // probably needed
                 Glide.with(context).load(Uri.parse(post.authorAvatar)).placeholder(animPlaceholder)
                     .error(R.drawable.null_avatar).timeout(10_000).circleCrop().into(it)
-            }
-            else {
+            } else {
                 it.setImageResource(R.drawable.null_avatar)
             }
             it.setOnClickListener {
                 listener.onPostAuthorClick(post.authorId)
             }
         }
-        binding.attachment.also {
-            if (post.attachment != null) {
-                it.visibility = View.VISIBLE
-                Glide.with(context).load(Uri.parse("${BASE_URL}images/${post.attachment.url}"))
-                    .timeout(10_000).into(it)
-            } else {
-                it.visibility = View.GONE
-            }
-        }
+
         binding.menu.isVisible = post.ownedByMe
         binding.menu.setOnClickListener {
             PopupMenu(it.context, it).apply {
@@ -102,8 +91,39 @@ class PostHolder(
             author.text = post.author
             date.text = post.published.toString()
             content.text = post.content
+            post.link?.let {
+                link.apply {
+                    text = it
+                    isVisible = urls.isNotEmpty()
+                }
+            }
             like.text = ConverterCountFromIntToString.convertCount(post.likeOwnerIds.size)
             like.isChecked = post.likedByMe
+            mentioned.text = ConverterCountFromIntToString.convertCount(post.mentionIds.size)
+        }
+        post.attachment?.let {
+            val player = ExoPlayer.Builder(context).build()
+            val mediaItem = MediaItem.fromUri(Uri.parse(it.url))
+            player.setMediaItem(mediaItem)
+            player.prepare()
+            when (post.attachment.type) {
+                AttachmentType.IMAGE -> {
+                }
+
+                AttachmentType.VIDEO -> {
+                    binding.attachmentVideo.apply {
+                        isVisible = true
+                        this.player = player
+                    }
+                }
+                AttachmentType.AUDIO -> {
+                    binding.attachmentAudio.apply {
+                        isVisible = true
+                        this.player = player
+                    }
+                }
+            }
+
         }
     }
 }

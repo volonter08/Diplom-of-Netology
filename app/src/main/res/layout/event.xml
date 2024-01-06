@@ -4,10 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:backgroundTint="@color/white"
+    android:background="@drawable/border_item_event"
     android:padding="15dp"
+    android:layout_marginBottom="12dp"
     android:theme="@style/ThemeOverlay.App">
-
     <ImageView
         android:id="@+id/avatar"
         android:layout_width="48dp"
@@ -71,10 +71,20 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:lineSpacingExtra="@dimen/lineSpacingExtra"
-        app:layout_constraintBottom_toTopOf="@id/attachment"
+        app:layout_constraintBottom_toTopOf="@id/link"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/datetime"
 
+        />
+    <TextView
+        android:autoLink="web"
+        android:id = "@+id/link"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/content"
+        android:lineSpacingExtra="@dimen/lineSpacingExtra"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="10dp"
         />
     <ImageView
         android:id="@+id/attachment"
@@ -83,7 +93,7 @@
         android:adjustViewBounds="true"
         android:layout_marginTop="8dp"
         android:visibility="gone"
-        app:layout_constraintTop_toBottomOf="@id/content" />
+        app:layout_constraintTop_toBottomOf="@id/link" />
     <com.google.android.material.button.MaterialButton
         android:id="@+id/participate"
         style="@style/Widget.Material3.Button.IconButton.Filled"
@@ -108,7 +118,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:barrierDirection="bottom"
-        app:barrierMargin="0dp"
+        app:barrierMargin="10dp"
         app:constraint_referenced_ids="participate,menu" />
 
     <com.google.android.material.button.MaterialButton
@@ -136,12 +146,12 @@
         app:layout_constraintTop_toBottomOf="@id/barrier2" />
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/mentioned"
+        android:id="@+id/speakers"
         style="@style/Widget.App.TextButton.Share"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
-        app:icon="@drawable/tag"
+        app:icon="@drawable/speaker_icon"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/like" />
 </androidx.constraintlayout.widget.ConstraintLayout>

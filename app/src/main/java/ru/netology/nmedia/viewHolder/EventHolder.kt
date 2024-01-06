@@ -120,10 +120,19 @@ class EventHolder(val context: Context, val eventBinding:EventBinding,val listen
         }
         eventBinding.apply {
             author.text = event.author
-            date.text = event.published.toString()
+            date.text = event.published
+            datetime.text = event.datetime
             content.text = event.content
+            event.link?.let {
+                link.apply {
+                    text = it
+                    isVisible = urls.isNotEmpty()
+                }
+            }
             like.text = ConverterCountFromIntToString.convertCount(event.likeOwnerIds.size)
             like.isChecked = event.likedByMe
+            countMembers.text = ConverterCountFromIntToString.convertCount(event.likeOwnerIds.size) + "\nmembers"
+            speakers.text= ConverterCountFromIntToString.convertCount(event.speakerIds.size)
         }
     }
 }

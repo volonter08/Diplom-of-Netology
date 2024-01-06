@@ -99,6 +99,7 @@ class PostDisplayFragment : Fragment() {
             }
 
             override fun onCreateClick() {
+                findNavController().navigate(R.id.action_postDisplayFragment_to_savePostFragment)
             }
 
             override fun onPostAuthorClick(authorId:Int) {

@@ -4,6 +4,9 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.paging.PagingDataAdapter
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import ru.netology.nmedia.OnButtonTouchListener
 import ru.netology.nmedia.databinding.PostBinding
 import ru.netology.nmedia.diffutill.PostDiffCallback
@@ -20,7 +23,9 @@ class PostAdapter(val context:Context,
     override fun onBindViewHolder(holder: PostHolder, position: Int) {
         // FIXME: students will do in HW
         getItem(position)?.let {
-            holder.bind(it)
+            CoroutineScope(Dispatchers.Main).launch {
+                holder.bind(it)
+            }
         }
     }
 }
