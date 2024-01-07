@@ -4,6 +4,8 @@ import android.content.Context
 import android.graphics.drawable.AnimatedImageDrawable
 import android.net.Uri
 import android.os.Build
+import android.view.View
+import android.widget.ImageView
 import android.widget.PopupMenu
 import androidx.core.view.isVisible
 import androidx.media3.common.MediaItem
@@ -20,17 +22,32 @@ import ru.netology.nmedia.enumeration.AttachmentType
 
 class PostHolder(
     val context: Context,
-    private val binding: PostBinding,
-    val listener: OnButtonTouchListener
+    val binding: PostBinding,
+    private val listener: OnButtonTouchListener
 ) : RecyclerView.ViewHolder(binding.root) {
 
-    init{
-
-    }
     fun bind(post: Post) {
+        val avatarImageView = binding.avatar
+        val authorTextView = binding.author
+        val dateTextView = binding.date
+        val menuButton = binding.menu
+        val contentTextView = binding.content
+        val linkTextView = binding.link
+        val attachmentImageImageView = binding.attachmentImage.apply {
+            Glide.with(this).clear(this)
+            isVisible = false
+        }
+        val attachmentVideoPlayerView = binding.attachmentVideo.apply {
+            isVisible = false
+        }
+        val attachmentAudioPlayerView = binding.attachmentAudio.apply {
+            isVisible = false
+        }
         val likeButton = binding.like
         val shareButton = binding.share
-        binding.avatar.also {
+        val mentionedButton = binding.mentioned
+
+        avatarImageView.also {
             if (post.authorAvatar != null) {
                 val animPlaceholder =
                     context.getDrawable(R.drawable.loading_avatar) as AnimatedImageDrawable
@@ -44,86 +61,87 @@ class PostHolder(
                 listener.onPostAuthorClick(post.authorId)
             }
         }
+        authorTextView.text = post.author
+        dateTextView.text = post.published
+        menuButton.apply {
+            isVisible = post.ownedByMe
+            setOnClickListener {
+                PopupMenu(it.context, it).apply {
+                    inflate(R.menu.options)
+                    setOnMenuItemClickListener {
+                        when (it.itemId) {
+                            R.id.remove -> {
+                                listener.onRemoveClick(post)
+                                true
+                            }
 
-        binding.menu.isVisible = post.ownedByMe
-        binding.menu.setOnClickListener {
-            PopupMenu(it.context, it).apply {
-                inflate(R.menu.options)
-                setOnMenuItemClickListener {
-                    when (it.itemId) {
-                        R.id.remove -> {
-                            listener.onRemoveClick(post)
-                            true
+                            R.id.update -> {
+                                listener.onUpdateCLick(post)
+                                true
+                            }
+
+                            else -> false
                         }
-
-                        R.id.update -> {
-                            listener.onUpdateCLick(post)
-                            true
-                        }
-
-                        else -> false
                     }
-                }
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
-                    setForceShowIcon(true)
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+                        setForceShowIcon(true)
 
-            }.show()
-        }
-        post.link?.let {
-            binding.link.apply {
-                text = it
-                isVisible = urls.isNotEmpty()
+                }.show()
             }
         }
-        likeButton.setOnClickListener {
-            if (!post.likedByMe)
-                listener.onLikeCLick(post)
-            else
-                listener.onDislikeCLick(post)
+        contentTextView.text = post.content
+        linkTextView.apply {
+            text = post.link ?: ""
+            isVisible = urls.isNotEmpty()
+        }
+        if (post.attachment != null) {
+            when (post.attachment.type) {
+                AttachmentType.IMAGE -> {
+                    attachmentImageImageView.apply {
+                        isVisible = true
+                        Glide.with(this).load(post.attachment.url).into(this)
+                    }
+                }
+                AttachmentType.VIDEO -> {
+                    val player = ExoPlayer.Builder(context).build()
+                    val mediaItem = MediaItem.fromUri(Uri.parse(post.attachment.url))
+                    player.setMediaItem(mediaItem)
+                    attachmentVideoPlayerView.apply {
+                        isVisible = true
+                        this.player = player
+                    }
+                    player.prepare()
+                }
+
+                AttachmentType.AUDIO -> {
+                    val player = ExoPlayer.Builder(context).build()
+                    val mediaItem = MediaItem.fromUri(Uri.parse(post.attachment.url))
+                    player.setMediaItem(mediaItem)
+                    attachmentAudioPlayerView.apply {
+                        isVisible = true
+                        this.player = player
+                    }
+                    player.prepare()
+                }
+            }
+        }
+        likeButton.apply {
+            isChecked = post.likedByMe
+            text = ConverterCountFromIntToString.convertCount(post.likeOwnerIds.size)
+            setOnClickListener {
+                if (!isChecked)
+                    listener.onLikeCLick(post)
+                else
+                    listener.onDislikeCLick(post)
+            }
+            addOnCheckedChangeListener { button, isChecked ->
+                button.isChecked = !isChecked
+            }
         }
         shareButton.setOnClickListener {
             listener.onShareCLick(post)
         }
-        likeButton.addOnCheckedChangeListener { button, isChecked ->
-            button.isChecked = post.likedByMe
-        }
-        binding.apply {
-            author.text = post.author
-            date.text = post.published.toString()
-            content.text = post.content
-            post.link?.let {
-                link.apply {
-                    text = it
-                    isVisible = urls.isNotEmpty()
-                }
-            }
-            like.text = ConverterCountFromIntToString.convertCount(post.likeOwnerIds.size)
-            like.isChecked = post.likedByMe
-            mentioned.text = ConverterCountFromIntToString.convertCount(post.mentionIds.size)
-        }
-        post.attachment?.let {
-            val player = ExoPlayer.Builder(context).build()
-            val mediaItem = MediaItem.fromUri(Uri.parse(it.url))
-            player.setMediaItem(mediaItem)
-            player.prepare()
-            when (post.attachment.type) {
-                AttachmentType.IMAGE -> {
-                }
-
-                AttachmentType.VIDEO -> {
-                    binding.attachmentVideo.apply {
-                        isVisible = true
-                        this.player = player
-                    }
-                }
-                AttachmentType.AUDIO -> {
-                    binding.attachmentAudio.apply {
-                        isVisible = true
-                        this.player = player
-                    }
-                }
-            }
-
-        }
+        mentionedButton.text = ConverterCountFromIntToString.convertCount(post.mentionIds.size)
+        //println("visible_image_view:${binding.attachmentImage.isVisible} attachment = ${post.attachment} content: ${post.content} ")
     }
 }
