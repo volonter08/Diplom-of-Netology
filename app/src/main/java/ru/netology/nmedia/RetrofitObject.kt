@@ -10,8 +10,9 @@ import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
-import ru.netology.nmedia.activity.PostCreateRequest
+import ru.netology.nmedia.requests.PostCreateRequest
 import ru.netology.nmedia.dto.Event
+import ru.netology.nmedia.dto.Job
 import ru.netology.nmedia.dto.User
 import ru.netology.nmedia.requests.AuthenticationRequest
 import ru.netology.nmedia.responses.Token
@@ -27,7 +28,26 @@ interface AuthApiService {
     suspend fun getUserById(@Path("userId") userId: String): Response<User>
 
 }
+interface JobApiService{
 
+    suspend fun saveJobs(token: String?,job: Job):Response<Job>
+    suspend fun removeJobs( token: String?, jobId:Int):Response<Unit>
+
+}
+interface MyJobApiService:JobApiService{
+    @GET("api/my/jobs")
+    suspend fun getMyJobs(@Header("Authorization") token: String?): Response<List<Job>>
+    @POST("api/my/jobs")
+    override suspend fun saveJobs(@Header("Authorization") token: String?,@Body job: Job):Response<Job>
+    @DELETE("api/my/jobs/{job_id}")
+    override suspend fun removeJobs(@Header("Authorization") token: String?,@Path("job_id") jobId:Int):Response<Unit>
+
+}
+interface UserJobApiService:JobApiService{
+    @GET("api/{user_id}/jobs")
+    suspend fun getUserJobs(@Header("Authorization") token: String?,@Path("user_id") userId: Int): Response<List<Job>>
+
+}
 interface PostApiService {
 
     suspend fun getNewerPosts(id: Int, token: String?): Response<List<Post>>
@@ -52,7 +72,7 @@ interface PostApiService {
 
     //CRUD posts
     @POST("api/posts")
-    suspend fun savePost(@Body post: PostCreateRequest,@Header("Authorization") token: String?): Response<Post>
+    suspend fun savePost(@Body post: PostCreateRequest, @Header("Authorization") token: String?): Response<Post>
 
     @DELETE("api/posts/{id}")
     suspend fun removePostById(

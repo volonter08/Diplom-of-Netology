@@ -10,8 +10,6 @@ import androidx.paging.cachedIn
 import androidx.paging.map
 import ru.netology.nmedia.OnRetryListener
 import ru.netology.nmedia.auth.AppAuth
-import ru.netology.nmedia.dto.Post
-import ru.netology.nmedia.repository.PostRepository
 import kotlinx.coroutines.launch
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -64,7 +62,7 @@ class EventViewModel @Inject constructor(
     fun dislike(disLikedEvent: Event) {
         viewModelScope.launch {
             try {
-                repository.dislike(dislikedPost = disLikedEvent, tokenAccess )
+                repository.dislike(disliked = disLikedEvent, tokenAccess )
                 _dataState.setValue(FeedModelState())
             } catch (e: Exception) {
                 onError(e.message?:"") {
@@ -76,7 +74,7 @@ class EventViewModel @Inject constructor(
     fun remove(event: Event) {
         viewModelScope.launch {
             try {
-                repository.remove(event,tokenAccess)
+                repository.remove(event, tokenAccess)
             } catch (_: Exception) {
                 onError("Request is not succesfull") {
                     remove(event)

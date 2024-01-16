@@ -1,14 +1,11 @@
 package ru.netology.nmedia.repository
 
-import androidx.paging.PagingData
-import kotlinx.coroutines.flow.Flow
-import ru.netology.nmedia.dto.Post
+import ru.netology.nmedia.dto.Note
+import ru.netology.nmedia.requests.NoteCreateRequest
 
-interface  Repository<T : Any> {
-    val data: Flow<PagingData<T>>
-    suspend fun like(likedPost: T, token: String?)
-    suspend fun dislike(dislikedPost: T, token: String?)
-    suspend fun remove(removedPost: T, token: String?)
-    suspend fun createPost(content: String,link: String?,token: String?)
-    suspend fun update(post: Post,token: String?)
+interface  Repository<T : Note> {
+    suspend fun like(liked: T, token: String?)
+    suspend fun dislike(disliked: T, token: String?)
+    suspend fun remove(removed: T, token: String?)
+    suspend fun save(saved: T, token: String?)
 }

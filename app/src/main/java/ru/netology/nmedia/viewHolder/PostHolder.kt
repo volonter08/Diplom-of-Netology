@@ -2,6 +2,8 @@ package ru.netology.nmedia.viewHolder
 
 import android.content.Context
 import android.graphics.drawable.AnimatedImageDrawable
+import android.icu.text.DateFormat
+import android.icu.text.SimpleDateFormat
 import android.net.Uri
 import android.os.Build
 import android.view.View
@@ -53,7 +55,7 @@ class PostHolder(
                     context.getDrawable(R.drawable.loading_avatar) as AnimatedImageDrawable
                 animPlaceholder.start() // probably needed
                 Glide.with(context).load(Uri.parse(post.authorAvatar)).placeholder(animPlaceholder)
-                    .error(R.drawable.null_avatar).timeout(10_000).circleCrop().into(it)
+                    .error(R.drawable.avatar_svgrepo_com).timeout(10_000).circleCrop().into(it)
             } else {
                 it.setImageResource(R.drawable.null_avatar)
             }
@@ -62,7 +64,10 @@ class PostHolder(
             }
         }
         authorTextView.text = post.author
-        dateTextView.text = post.published
+        dateTextView.text = post.published.let{
+            val dateFormatOut: DateFormat = SimpleDateFormat("HH:mm:ss   dd/MM/yyyy")
+            dateFormatOut.format(it)
+        }
         menuButton.apply {
             isVisible = post.ownedByMe
             setOnClickListener {
@@ -126,17 +131,17 @@ class PostHolder(
             }
         }
         likeButton.apply {
-            isChecked = post.likedByMe
             text = ConverterCountFromIntToString.convertCount(post.likeOwnerIds.size)
             setOnClickListener {
-                if (!isChecked)
+                if (!post.likedByMe)
                     listener.onLikeCLick(post)
                 else
                     listener.onDislikeCLick(post)
             }
             addOnCheckedChangeListener { button, isChecked ->
-                button.isChecked = !isChecked
+                button.isChecked = post.likedByMe
             }
+            isChecked = post.likedByMe
         }
         shareButton.setOnClickListener {
             listener.onShareCLick(post)

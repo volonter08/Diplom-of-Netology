@@ -67,7 +67,6 @@ class PostViewModel @AssistedInject constructor(
         viewModelScope.launch {
             try {
                 repository.like(likedPost, profileDao.getAccessToken())
-                _dataState.setValue(FeedModelState())
             } catch (e: Exception) {
                 onError(e.message ?: "") {
                     like(likedPost)
@@ -79,8 +78,7 @@ class PostViewModel @AssistedInject constructor(
     fun dislike(disLikedPost: Post) {
         viewModelScope.launch {
             try {
-                repository.dislike(dislikedPost = disLikedPost, profileDao.getAccessToken())
-                _dataState.setValue(FeedModelState())
+                repository.dislike(disliked = disLikedPost, profileDao.getAccessToken())
             } catch (e: Exception) {
                 onError(e.message ?: "") {
                     dislike(disLikedPost)
@@ -105,31 +103,20 @@ class PostViewModel @AssistedInject constructor(
         }
     }
 
-    fun createPost(content: String,link:String?=null) {
+    fun savePost(post:Post) {
         viewModelScope.launch {
             try {
                 _dataState.value = FeedModelState(loading = true)
-                repository.createPost(content, link,profileDao.getAccessToken())
-                _dataState.value = FeedModelState(isPostCreated = true)
+                repository.save(post,profileDao.getAccessToken())
+                _dataState.value = FeedModelState(isSaved = true)
             } catch (e: Exception) {
                 onError(e.message?:"") {
-                    createPost(content,link)
+                    savePost(post)
                 }
             }
         }
     }
 
-    fun update(post: Post) {
-        viewModelScope.launch {
-            try {
-                repository.update(post,profileDao.getAccessToken())
-            } catch (e: Exception) {
-                onError(e.message?:"") {
-                    update(post)
-                }
-            }
-        }
-    }
 
     private fun onError(reason: String, onRetryListener: OnRetryListener) {
         _dataState.value = FeedModelState(error = Error(reason, onRetryListener))

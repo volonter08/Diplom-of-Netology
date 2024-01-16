@@ -6,6 +6,8 @@ import androidx.room.PrimaryKey
 import ru.netology.nmedia.dto.Event
 import ru.netology.nmedia.dto.UserPreview
 import ru.netology.nmedia.model.TypeOnline
+import java.util.Date
+
 @Entity
 data class EventEntity(
     @PrimaryKey(autoGenerate = true)
@@ -15,8 +17,8 @@ data class EventEntity(
     val authorAvatar: String?,
     val authorJob:String?,
     val content: String?,
-    val datetime: String,
-    val published: String?,
+    val datetime: Date?,
+    val published: Date?,
     @Embedded
     val coords: CoordinatesEmbeddable?=null,
     val typev: TypeOnline,
@@ -31,7 +33,7 @@ data class EventEntity(
     val ownedByMe: Boolean = false,
     val users: Map<String, UserPreview>
 ){
-    fun toDto() = Event(id, authorId, author?:"", authorAvatar?:"", authorJob?:"", content?:"", datetime ,published?:"",coords?.toDto(), typev, link?:"",likeOwnerIds, likedByMe,speakerIds,participantsIds,participatedByMe, attachment?.toDto(), ownedByMe, users )
+    fun toDto() = Event(id, authorId, author?:"", authorAvatar?:"", authorJob?:"", content?:"", datetime ,published,coords?.toDto(), typev, link?:"",likeOwnerIds, likedByMe,speakerIds,participantsIds,participatedByMe, attachment?.toDto(), ownedByMe, users )
 
     companion object {
         fun fromDto(dto: Event) =dto.run{

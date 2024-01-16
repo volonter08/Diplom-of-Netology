@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import ru.netology.nmedia.OnButtonTouchListener
 import ru.netology.nmedia.R
+import ru.netology.nmedia.adapter.JobAdapter
 import ru.netology.nmedia.adapter.PostAdapter
 import ru.netology.nmedia.databinding.FragmentProfileBinding
 import ru.netology.nmedia.databinding.FragmentUserBinding
@@ -29,6 +30,8 @@ import ru.netology.nmedia.dto.Note
 import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.dto.User
 import ru.netology.nmedia.model.ErrorCallback
+import ru.netology.nmedia.viewModel.JobViewModel
+import ru.netology.nmedia.viewModel.JobViewModelFactory
 import ru.netology.nmedia.viewModel.PostViewModel
 import ru.netology.nmedia.viewModel.PostViewModelFactory
 import ru.netology.nmedia.viewModel.ProfileViewModel
@@ -59,6 +62,14 @@ class UserFragment : Fragment() {
             defaultViewModelCreationExtras.withCreationCallback<
                     PostViewModelFactory> { factory ->
                 factory.create(userId)
+            }
+        }
+    )
+    private val jobViewModel by viewModels<JobViewModel>(
+        extrasProducer = {
+            defaultViewModelCreationExtras.withCreationCallback<JobViewModelFactory> { factory->
+                factory.create(userId)
+
             }
         }
     )
@@ -114,16 +125,14 @@ class UserFragment : Fragment() {
             override fun onUpdateCLick(note: Note) {
 
             }
-
-            override fun onCreateClick() {
-            }
-
             override fun onPostAuthorClick(authorId: Int) {
             }
         }
         val postAdapter = PostAdapter(context = requireContext(), onButtonTouchListener)
+        val jobAdapter = JobAdapter(onButtonTouchListener)
         val userFragmentBinding = FragmentUserBinding.inflate(layoutInflater, container, false)
         userFragmentBinding.postRecycleView.adapter = postAdapter
+        userFragmentBinding.jobRecycleView.adapter = jobAdapter
         profileViewModel.dataProfile.observe(viewLifecycleOwner) {
             userFragmentBinding.login.text = String.format(getString(R.string.login), it.login)
             userFragmentBinding.name.text = String.format(getString(R.string.name), it.name)
@@ -149,6 +158,13 @@ class UserFragment : Fragment() {
                 }
             }
         }
+        jobViewModel.dataState.observe(viewLifecycleOwner){feedModel->
+            userFragmentBinding.jobsSwipeRefreshLayout.isRefreshing = feedModel.isRefreshed
+            feedModel.error?.let {
+                errorCallback.onError(it.reason, it.onRetryListener)
+            }
+
+        }
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 postViewModel.data.collectLatest {
@@ -172,7 +188,16 @@ class UserFragment : Fragment() {
                 }
             }
         }
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED){
+                jobViewModel.data.collectLatest {
+                    jobAdapter.submitList(it)
+                    userFragmentBinding.emptyMyJobsListText.isVisible = it.isEmpty()
+                }
+            }
+        }
         userFragmentBinding.postSwipeRefreshLayout.setOnRefreshListener(postAdapter::refresh)
+        userFragmentBinding.jobsSwipeRefreshLayout.setOnRefreshListener(jobViewModel::loadJobs)
         return userFragmentBinding.root
     }
 

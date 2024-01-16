@@ -7,6 +7,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.Dispatchers
 import ru.netology.nmedia.auth.AppAuth
+import ru.netology.nmedia.dao.jobDao.MyJobDao
 import ru.netology.nmedia.dao.postDao.AllPostDao
 import ru.netology.nmedia.dao.postDao.MyPostDao
 import ru.netology.nmedia.dao.postDao.PostDao
@@ -40,6 +41,9 @@ object DaoModule {
     @Provides
     @Singleton
     fun provideEventRemoteKeyDao(db: AppDb): EventRemoteKeyDao = db.eventRemoteKeyDao()
+    @Provides
+    @Singleton
+    fun provideMyJobDao(db:AppDb):MyJobDao = db.myJobDao()
     @Provides
     @Singleton
     fun provideLiveDataProfile(auth: AppAuth):LiveData<Profile> = auth.authStateFlow.asLiveData(Dispatchers.Default)

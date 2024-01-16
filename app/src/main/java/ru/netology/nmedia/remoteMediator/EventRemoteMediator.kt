@@ -1,5 +1,7 @@
 package ru.netology.nmedia.remoteMediator
 
+import android.icu.text.DateFormat
+import android.icu.text.SimpleDateFormat
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
 import androidx.paging.PagingState
@@ -30,15 +32,9 @@ class EventRemoteMediator @Inject constructor(
         state: PagingState<Int, EventEntity>
     ): MediatorResult {
         try {
-            val minId = eventRemoteKeyDao.min() ?: -1
-            val maxId = eventRemoteKeyDao.max() ?: -1
             val response = when (loadType) {
                 LoadType.REFRESH -> {
-                    if (maxId == -1) {
                         service.getLatestEvents(state.config.initialLoadSize,profileDao.getAccessToken())
-                    } else {
-                        service.getNewerEvents(maxId,profileDao.getAccessToken())
-                    }
                 }
 
                 LoadType.PREPEND -> {
@@ -63,19 +59,16 @@ class EventRemoteMediator @Inject constructor(
                 db.withTransaction {
                     when (loadType) {
                         LoadType.REFRESH -> {
+                            eventDao.removeAll()
                             eventRemoteKeyDao.insert(
                                 listOf(
-
                                     EventRemoteKeyEntity(
                                         type = KeyType.AFTER,
                                         id = body.first().id,
                                     ),
                                     EventRemoteKeyEntity(
                                         type = KeyType.BEFORE,
-                                        id = if (minId == -1) body.last().id else kotlin.math.min(
-                                            minId,
-                                            body.last().id
-                                        )
+                                        id = body.last().id
                                     )
                                 )
                             )

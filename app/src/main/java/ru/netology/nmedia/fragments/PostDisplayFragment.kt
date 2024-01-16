@@ -3,50 +3,52 @@ package ru.netology.nmedia.fragments
 import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
 import android.os.Bundle
+import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.ViewPropertyAnimator
-import android.view.animation.LayoutAnimationController
 import android.view.animation.LinearInterpolator
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.commit
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
-import ru.netology.nmedia.OnButtonTouchListener
-import ru.netology.nmedia.adapter.ItemLoadingStateAdapter
-import ru.netology.nmedia.databinding.FragmentPostDisplayBinding
-import ru.netology.nmedia.dto.Post
-import ru.netology.nmedia.viewModel.PostViewModel
+import com.example.netologyandroidhomework1.AndroidUtils
+import com.example.netologyandroidhomework1.Dismissible
+import com.example.netologyandroidhomework1.RevealAnimationSetting
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import ru.netology.nmedia.OnButtonTouchListener
 import ru.netology.nmedia.R
 import ru.netology.nmedia.adapter.EventAdapter
+import ru.netology.nmedia.adapter.ItemLoadingStateAdapter
 import ru.netology.nmedia.adapter.PostAdapter
+import ru.netology.nmedia.databinding.FragmentPostDisplayBinding
 import ru.netology.nmedia.dto.Event
 import ru.netology.nmedia.dto.Note
-import ru.netology.nmedia.dto.User
+import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.model.ErrorCallback
 import ru.netology.nmedia.viewModel.EventViewModel
+import ru.netology.nmedia.viewModel.PostViewModel
 import ru.netology.nmedia.viewModel.PostViewModelFactory
 import javax.inject.Inject
+import kotlin.concurrent.thread
+
 
 @AndroidEntryPoint
 class PostDisplayFragment : Fragment() {
     @Inject
     lateinit var errorCallback: ErrorCallback
 
+    lateinit var viewBinding:FragmentPostDisplayBinding
     private val postViewModel: PostViewModel by viewModels<PostViewModel>(
         extrasProducer = {
             defaultViewModelCreationExtras.withCreationCallback<
@@ -55,13 +57,14 @@ class PostDisplayFragment : Fragment() {
             }
         }
     )
+
     private val eventViewModel: EventViewModel by activityViewModels()
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val viewBinding = FragmentPostDisplayBinding.inflate(layoutInflater, container, false)
+        viewBinding = FragmentPostDisplayBinding.inflate(layoutInflater, container, false)
         val onButtonTouchListener = object : OnButtonTouchListener {
             override fun onLikeCLick(likedNote: Note) {
                 likedNote.run {
@@ -97,11 +100,6 @@ class PostDisplayFragment : Fragment() {
             override fun onUpdateCLick(note: Note) {
 
             }
-
-            override fun onCreateClick() {
-                findNavController().navigate(R.id.action_postDisplayFragment_to_savePostFragment)
-            }
-
             override fun onPostAuthorClick(authorId:Int) {
                 findNavController().navigate(R.id.action_postDisplayFragment_to_userFragment,
                     bundleOf("user_id" to authorId)
@@ -191,32 +189,58 @@ class PostDisplayFragment : Fragment() {
                 }
             }
         }
-        viewBinding.createButton.setOnClickListener {
-            onButtonTouchListener.onCreateClick()
+        viewBinding.createPostButton.setOnClickListener {
+            showSavePostFragment()
+        }
+        viewBinding.createEventButton.setOnClickListener {
+            showSaveEventFragment()
         }
         viewBinding.buttonSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
             if (isChecked) {
-                viewBinding.eventSwipeRefreshLayout.isVisible = isChecked
+                viewBinding.relativeEventLayout.isVisible = isChecked
                 ObjectAnimator.ofPropertyValuesHolder(
-                    viewBinding.eventSwipeRefreshLayout,
+                    viewBinding.relativeEventLayout,
                     PropertyValuesHolder.ofFloat(View.ALPHA, 0F, 1F)
                 ).apply {
                     duration = 2000
                     interpolator = LinearInterpolator()
                 }.start()
-                viewBinding.postSwipeRefreshLayout.visibility = View.GONE
+                viewBinding.relativePostLayout.visibility = View.GONE
             } else {
-                viewBinding.postSwipeRefreshLayout.isVisible = !isChecked
+                viewBinding.relativePostLayout.isVisible = !isChecked
                 ObjectAnimator.ofPropertyValuesHolder(
-                    viewBinding.postSwipeRefreshLayout,
+                    viewBinding.relativePostLayout,
                     PropertyValuesHolder.ofFloat(View.ALPHA, 0F, 1F)
                 ).apply {
                     duration = 2000
                     interpolator = LinearInterpolator()
                 }.start()
-                viewBinding.eventSwipeRefreshLayout.visibility = View.GONE
+                viewBinding.relativeEventLayout.visibility = View.GONE
             }
         }
         return viewBinding.root
     }
+    fun showSavePostFragment() {
+        findNavController().navigate(
+            R.id.action_postDisplayFragment_to_savePostFragment,
+            bundleOf("revealAnimationSetting" to constructRevealSettings())
+        )
+    }
+    fun showSaveEventFragment() {
+        findNavController().navigate(
+            R.id.action_postDisplayFragment_to_saveEventFragment,
+            bundleOf("revealAnimationSetting" to constructRevealSettings())
+        )
+    }
+    private fun constructRevealSettings(): RevealAnimationSetting? {
+        val addFab = viewBinding.createPostButton
+        val containerView = viewBinding.root
+        return RevealAnimationSetting(
+            (addFab.x + addFab.width / 2).toInt(),
+            (addFab.y + addFab.height / 2).toInt(),
+            containerView.width,
+            containerView.height
+        )
+    }
+
 }

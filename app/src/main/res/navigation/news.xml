@@ -15,8 +15,13 @@
         <action
             android:id="@+id/action_postDisplayFragment_to_userFragment"
             app:destination="@id/userFragment" />
+        <action
+            android:id="@+id/action_postDisplayFragment_to_saveEventFragment"
+            app:destination="@id/saveEventPFragment"
+            app:restoreState="true"
+            />
     </fragment>
-    <fragment
+    <dialog
         android:id="@+id/savePostFragment"
         android:name="ru.netology.nmedia.fragments.SavePostFragment"
         android:label="SavePostFragment" />
@@ -24,4 +29,16 @@
         android:id="@+id/userFragment"
         android:name="ru.netology.nmedia.fragments.UserFragment"
         android:label="UserFragment" />
+    <dialog
+        android:id="@+id/saveEventPFragment"
+        android:name="ru.netology.nmedia.fragments.SaveEventFragment"
+        android:label="SaveEventPFragment" >
+        <action
+            android:id="@+id/action_saveEventFragment_to_timePickerFragment"
+            app:destination="@id/timePickerFragment" />
+    </dialog>
+    <dialog
+        android:id="@+id/timePickerFragment"
+        android:name="ru.netology.nmedia.fragments.TimePickerFragment"
+        android:label="TimePickerFragment" />
 </navigation>

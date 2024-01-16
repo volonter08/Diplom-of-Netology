@@ -4,11 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#fadee7"
+    android:background="#b6fce3"
     android:padding="16dp">
-
     <LinearLayout
-        android:id="@+id/main_layout_save_post"
+        android:id="@+id/main_layout_save_event"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
@@ -31,12 +30,12 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="3"
                 android:layout_gravity="center_vertical"
+                android:layout_marginHorizontal="8dp"
+                android:layout_weight="3"
                 android:gravity="center_vertical"
                 android:text="@string/edit_post"
-                android:textColor="?android:attr/statusBarColor"
-                android:layout_marginHorizontal="8dp"
+                android:textColor="?attr/colorAccent"
                 android:textSize="20sp" />
 
             <ImageButton
@@ -52,7 +51,10 @@
             android:id="@+id/inputLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/border_item_post">
+            android:background="@drawable/border_item_event"
+            android:paddingVertical="20dp"
+            android:paddingHorizontal="20dp"
+            >
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -60,8 +62,7 @@
                 android:layout_alignParentStart="true"
                 android:layout_alignParentEnd="true"
                 android:layout_centerHorizontal="true"
-                android:layout_marginHorizontal="30dp"
-                android:layout_marginTop="20dp"
+
                 android:orientation="vertical">
 
                 <TextView
@@ -85,14 +86,43 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/save"
-                    style="@style/Widget.App.SaveOrCreateButton"
+                <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:text="Date time:" />
+
+                <TextView
+                    android:id="@+id/text_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-black"
+                    android:layout_gravity="center_horizontal"
+                    android:textSize="20sp"
+                    />
+                <TextView
+                    android:id="@+id/text_date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-black"
+                    android:layout_gravity="center_horizontal"
+                    android:textSize="20sp"
+                    />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
                     android:layout_gravity="end"
-                    android:layout_marginVertical="20dp" />
+                    android:layout_marginVertical="20dp"
+                    >
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/save"
+                        style="@style/Widget.App.SaveOrCreateButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end" />
+                </LinearLayout>
             </LinearLayout>
         </RelativeLayout>
     </LinearLayout>

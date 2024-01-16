@@ -11,7 +11,10 @@ import retrofit2.converter.gson.GsonConverterFactory
 import ru.netology.nmedia.AllEventsApiService
 import ru.netology.nmedia.AllPostApiService
 import ru.netology.nmedia.AuthApiService
+import ru.netology.nmedia.JobApiService
+import ru.netology.nmedia.MyJobApiService
 import ru.netology.nmedia.MyPostApiService
+import ru.netology.nmedia.UserJobApiService
 import ru.netology.nmedia.UserPostApiService
 import javax.inject.Singleton
 
@@ -73,5 +76,27 @@ object ApiModule {
                         level = HttpLoggingInterceptor.Level.BODY
                     }).build()
             ).build().create(UserPostApiService::class.java)
+    }
+    @Provides
+    @Singleton
+    fun provideMyJobApiService(): MyJobApiService {
+        return Retrofit.Builder().addConverterFactory(GsonConverterFactory.create())
+            .baseUrl(BASE_URL).client(
+                OkHttpClient.Builder().addInterceptor( HttpLoggingInterceptor()
+                    .apply {
+                        level = HttpLoggingInterceptor.Level.BODY
+                    }).build()
+            ).build().create(MyJobApiService::class.java)
+    }
+    @Provides
+    @Singleton
+    fun provideUserJobApiService(): UserJobApiService {
+        return Retrofit.Builder().addConverterFactory(GsonConverterFactory.create())
+            .baseUrl(BASE_URL).client(
+                OkHttpClient.Builder().addInterceptor( HttpLoggingInterceptor()
+                    .apply {
+                        level = HttpLoggingInterceptor.Level.BODY
+                    }).build()
+            ).build().create(UserJobApiService::class.java)
     }
 }

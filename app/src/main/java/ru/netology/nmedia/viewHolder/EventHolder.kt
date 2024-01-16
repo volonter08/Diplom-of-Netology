@@ -2,6 +2,8 @@ package ru.netology.nmedia.viewHolder
 
 import android.content.Context
 import android.graphics.drawable.AnimatedImageDrawable
+import android.icu.text.DateFormat
+import android.icu.text.SimpleDateFormat
 import android.net.Uri
 import android.os.Build
 import android.view.View
@@ -120,8 +122,14 @@ class EventHolder(val context: Context, val eventBinding:EventBinding,val listen
         }
         eventBinding.apply {
             author.text = event.author
-            date.text = event.published
-            datetime.text = event.datetime
+            date.text = event.published.let{
+                val dateFormatOut: DateFormat = SimpleDateFormat("HH:mm:ss   dd/MM/yyyy")
+                dateFormatOut.format(it)
+            }
+            datetime.text = event.datetime.let{
+                val dateFormatOut: DateFormat = SimpleDateFormat("HH:mm   dd MMM yyyy")
+                dateFormatOut.format(it)
+            }
             content.text = event.content
             event.link?.let {
                 link.apply {

@@ -3,22 +3,23 @@ package ru.netology.nmedia.dto
 import ru.netology.nmedia.entity.PostEntity
 import ru.netology.nmedia.model.Attachment
 import java.io.Serializable
+import java.util.Date
 
 data class Post(
-    override val id: Int,
-    override val authorId: Int,
-    override val author: String,
-    override val authorAvatar: String? = null,
-    override val authorJob:String? = null,
-    override val content: String,
-    override val published: String,
-    override val coords:Coordinates?=null,
-    override val link:String? = null,
-    override val likeOwnerIds:List<Int> = emptyList(),
+    override val id: Int = 0,
+    val authorId: Int = 0,
+    val author: String = "",
+    val authorAvatar: String? = null,
+    val authorJob:String? = null,
+    val content: String,
+    val published: Date?=null,
+    val coords:Coordinates?=null,
+    val link:String? = null,
+    val likeOwnerIds:List<Int> = emptyList(),
     val mentionIds:List<Int> = emptyList(),
     val mentionedMe:Boolean = false,
-    override val likedByMe: Boolean = false,
-    override val attachment: Attachment? = null,
-    override val ownedByMe: Boolean = false,
-    override val users: Map<String,UserPreview> = emptyMap(),
-): Serializable,Note
+    val likedByMe: Boolean = false,
+    val attachment: Attachment? = null,
+    val ownedByMe: Boolean = false,
+    val users: Map<String,UserPreview> = emptyMap(),
+): Note

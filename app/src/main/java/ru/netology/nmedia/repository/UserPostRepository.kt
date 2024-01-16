@@ -7,7 +7,6 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import androidx.room.withTransaction
 import com.google.gson.Gson
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -16,8 +15,6 @@ import kotlinx.coroutines.flow.Flow
 import ru.netology.nmedia.UserPostApiService
 import ru.netology.nmedia.dao.ProfileDao
 import ru.netology.nmedia.dto.Post
-import ru.netology.nmedia.entity.AllPostEntity
-import ru.netology.nmedia.entity.MyPostEntity
 import ru.netology.nmedia.responses.ErrorResponse
 
 
@@ -36,8 +33,8 @@ class UserPostsRepository @AssistedInject constructor(
         pagingSourceFactory =  invalidatingPagingSourceFactory
     ).flow
 
-    override suspend fun like(likedPost: Post, token: String?) {
-        val response = retrofitService.likePostById(likedPost.id, token)
+    override suspend fun like(liked: Post, token: String?) {
+        val response = retrofitService.likePostById(liked.id, token)
         if (!response.isSuccessful) {
             val error: ErrorResponse? =
                 Gson().fromJson(
@@ -49,8 +46,8 @@ class UserPostsRepository @AssistedInject constructor(
             invalidatingPagingSourceFactory.invalidate()
     }
 
-    override suspend fun dislike(dislikedPost: Post, token: String?) {
-        val response = retrofitService.dislikePostById(dislikedPost.id, token)
+    override suspend fun dislike(disliked: Post, token: String?) {
+        val response = retrofitService.dislikePostById(disliked.id, token)
         if (!response.isSuccessful) {
             val error: ErrorResponse? =
                 Gson().fromJson(

@@ -47,55 +47,82 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-            android:id="@+id/post_swipe_refresh_layout"
+        <RelativeLayout
+            android:id="@+id/relative_post_layout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@drawable/border_post"
-            android:padding="20dp"
-            tools:layout_editor_absoluteX="-83dp"
-            tools:layout_editor_absoluteY="0dp">
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/post_recycleView"
+            android:layout_height="match_parent">
+            <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+                android:id="@+id/post_swipe_refresh_layout"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_margin="15dp"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:context=".activity.MainActivity"
-                tools:listitem="@layout/post" />
-        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+                android:layout_height="match_parent"
+                android:background="@drawable/border_post"
+                android:padding="20dp"
+                tools:layout_editor_absoluteX="-83dp"
+                tools:layout_editor_absoluteY="0dp">
 
-        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-            android:id="@+id/event_swipe_refresh_layout"
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/post_recycleView"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_margin="15dp"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:context=".activity.MainActivity"
+                    tools:listitem="@layout/post" />
+
+            </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/create_post_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentBottom="true"
+                android:layout_gravity="end"
+                android:layout_margin="6dp"
+                android:backgroundTint="#f01616"
+                app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlayExtended"
+                app:srcCompat="@drawable/baseline_create_24"
+                app:tint="@color/white" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/relative_event_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@drawable/border_event"
-            android:padding="20dp"
             android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent">
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/event_recycleView"
+            >
+            <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+                android:id="@+id/event_swipe_refresh_layout"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_margin="15dp"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:context=".activity.MainActivity"
-                tools:listitem="@layout/event" />
-        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/create_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlayExtended"
-            android:layout_gravity="end"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_margin="6dp"
-            app:srcCompat="@drawable/baseline_create_24" />
+                android:layout_height="match_parent"
+                android:background="@drawable/border_event"
+                android:padding="20dp"
+
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/event_recycleView"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_margin="15dp"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:context=".activity.MainActivity"
+                    tools:listitem="@layout/event" />
+            </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/create_event_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentBottom="true"
+                android:layout_margin="6dp"
+                android:backgroundTint="#4bd06a"
+                app:tint="@color/white"
+                app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlayExtended"
+                app:srcCompat="@drawable/baseline_create_24" />
+        </RelativeLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </LinearLayout>

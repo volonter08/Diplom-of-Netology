@@ -9,6 +9,5 @@ interface OnButtonTouchListener {
     fun onShareCLick(note: Note)
     fun onRemoveClick(removedNote:Note)
     fun onUpdateCLick(note: Note)
-    fun onCreateClick()
     fun onPostAuthorClick(authorId:Int)
 }

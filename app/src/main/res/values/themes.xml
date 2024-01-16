@@ -1,6 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Theme.NetologyAndroidHomeWork1" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="Theme.NetologyAndroidHomeWork1" parent="Theme.Material3.Light.NoActionBar">
         <!-- Primary brand color. -->
         <item name="colorPrimary">#0066FF</item>
         <item name="colorSecondary">#5D00F5</item>

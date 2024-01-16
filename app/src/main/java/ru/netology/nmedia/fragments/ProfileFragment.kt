@@ -22,14 +22,18 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import ru.netology.nmedia.OnButtonTouchListener
 import ru.netology.nmedia.R
+import ru.netology.nmedia.adapter.JobAdapter
 import ru.netology.nmedia.adapter.PostAdapter
 import ru.netology.nmedia.databinding.FragmentProfileBinding
 import ru.netology.nmedia.dto.Event
+import ru.netology.nmedia.dto.Job
 import ru.netology.nmedia.dto.Note
 import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.dto.Profile
 import ru.netology.nmedia.model.ErrorCallback
 import ru.netology.nmedia.viewModel.AuthViewModel
+import ru.netology.nmedia.viewModel.JobViewModel
+import ru.netology.nmedia.viewModel.JobViewModelFactory
 import ru.netology.nmedia.viewModel.PostViewModel
 import ru.netology.nmedia.viewModel.PostViewModelFactory
 import ru.netology.nmedia.viewModel.ProfileViewModel
@@ -64,6 +68,13 @@ class ProfileFragment : Fragment() {
         extrasProducer = {
             defaultViewModelCreationExtras.withCreationCallback<
                     PostViewModelFactory> { factory ->
+                factory.create(0)
+            }
+        }
+    )
+    private val jobViewModel by viewModels<JobViewModel>(
+        extrasProducer = {
+            defaultViewModelCreationExtras.withCreationCallback<JobViewModelFactory> { factory->
                 factory.create(0)
             }
         }
@@ -111,25 +122,25 @@ class ProfileFragment : Fragment() {
                     when (this) {
                         is Post -> postViewModel.remove(removedNote as Post)
                         is Event -> {}
+                        is Job -> jobViewModel.remove(removedNote as Job)
+                        }
                     }
                 }
-            }
 
             override fun onUpdateCLick(note: Note) {
-
+                TODO("Not yet implemented")
             }
 
-            override fun onCreateClick() {
-            }
 
             override fun onPostAuthorClick(authorId: Int) {
                 TODO("Not yet implemented")
             }
-
         }
+
         val profileFragmentBinding =
             FragmentProfileBinding.inflate(layoutInflater, container, false)
         val postAdapter = PostAdapter(context = requireContext(), onButtonTouchListener)
+        val jobAdapter = JobAdapter(onButtonTouchListener)
         dataMyProfile.observe(viewLifecycleOwner) {
             if (it.id == 0 && it.token == null) {
                 findNavController().navigate(R.id.action_profileFragment_to_signInFragment)
@@ -143,17 +154,25 @@ class ProfileFragment : Fragment() {
                     requireContext().getDrawable(R.drawable.loading_avatar) as AnimatedImageDrawable
                 animPlaceHolder.start()// probably needed
                 Glide.with(requireContext()).load(it.avatar).circleCrop()
-                    .placeholder(animPlaceHolder).timeout(10_000).error(R.drawable.null_avatar)
+                    .placeholder(animPlaceHolder).timeout(10_000).error(R.drawable.avatar_svgrepo_com)
                     .into(profileFragmentBinding.profileAvatar)
                 postAdapter.refresh()
             }
         }
         profileFragmentBinding.postRecycleView.adapter = postAdapter
+        profileFragmentBinding.jobRecycleView.adapter = jobAdapter
         profileViewModel.dataProfile.observe(viewLifecycleOwner) {
             authViewModel.updateUserData(it)
         }
         profileViewModel.dataState.observe(viewLifecycleOwner) {
             profileFragmentBinding.progressBarLayout.isVisible = it.loading
+            it.error?.let {
+                errorCallback.onError(it.reason, it.onRetryListener)
+            }
+        }
+        jobViewModel.dataState.observe(viewLifecycleOwner) {
+            profileFragmentBinding.progressBarLayout.isVisible = it.loading
+            profileFragmentBinding.jobsSwipeRefreshLayout.isRefreshing = it.isRefreshed
             it.error?.let {
                 errorCallback.onError(it.reason, it.onRetryListener)
             }
@@ -187,7 +206,17 @@ class ProfileFragment : Fragment() {
                 }
             }
         }
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                jobViewModel.data.collectLatest {
+                    jobAdapter.submitList(it)
+                    profileFragmentBinding.emptyMyPostListText.isVisible = it.isEmpty()
+                }
+            }
+        }
+
         profileFragmentBinding.postSwipeRefreshLayout.setOnRefreshListener(postAdapter::refresh)
+        profileFragmentBinding.jobsSwipeRefreshLayout.setOnRefreshListener(jobViewModel::loadJobs)
         return profileFragmentBinding.root
     }
 

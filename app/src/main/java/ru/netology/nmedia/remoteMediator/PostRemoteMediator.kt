@@ -1,14 +1,16 @@
 package ru.netology.nmedia.remoteMediator
 
+import android.icu.text.DateFormat
+import android.icu.text.SimpleDateFormat
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import androidx.room.withTransaction
 import ru.netology.nmedia.PostApiService
+import ru.netology.nmedia.dao.ProfileDao
 import ru.netology.nmedia.dao.postDao.PostDao
 import ru.netology.nmedia.dao.postRemoteKeyDao.PostRemoteKeyDao
-import ru.netology.nmedia.dao.ProfileDao
 import ru.netology.nmedia.db.AppDb
 import ru.netology.nmedia.entity.AllPostEntity
 import ru.netology.nmedia.entity.AllPostRemoteKeyEntity
@@ -54,8 +56,6 @@ class PostRemoteMediator<T : PostEntity, V : PostRemoteKeyEntity> @Inject constr
         state: PagingState<Int, T>
     ): MediatorResult {
         try {
-            if(t.isAssignableFrom(MyPostEntity::class.java))
-                println("")
             val response = when (loadType) {
                 LoadType.REFRESH -> {
                     service.getLatestPosts(

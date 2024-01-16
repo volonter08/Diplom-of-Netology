@@ -11,46 +11,61 @@
         android:padding="16dp"
         tools:context="ru.netology.nmedia.fragments.ProfileFragment">
 
-        <ImageView
-            android:id="@+id/profile_avatar"
-            android:layout_width="200dp"
-            android:layout_height="200dp"
-            android:layout_marginVertical="20dp"
-            android:src="@drawable/ic_netologydz_foreground"
-            app:layout_constraintBottom_toTopOf="@id/profile_avatar"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/data_profile"
-            android:layout_width="200dp"
+        <LinearLayout
+            android:id="@+id/data_profile_linear_layout"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            app:contentPadding="20dp"
+            android:layout_marginVertical="20dp"
+            android:orientation="horizontal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/profile_avatar">
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/profile_avatar"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:adjustViewBounds="true"
+                tools:src="@drawable/ic_netologydz_foreground" />
 
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="match_parent"
+                android:layout_weight="1"
                 android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/login"
-                    style="@style/TextViewMaterialCardView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-
-                <TextView
-                    android:id="@+id/name"
-                    style="@style/TextViewMaterialCardView"
-                    android:layout_width="wrap_content"
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/data_profile"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="" />
+                    app:contentPadding="20dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/profile_avatar">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/login"
+                            style="@style/TextViewMaterialCardView"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+
+                        <TextView
+                            android:id="@+id/name"
+                            style="@style/TextViewMaterialCardView"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="" />
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
             </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
 
         <FrameLayout
             android:id="@+id/progress_bar_layout"
@@ -67,19 +82,58 @@
         </FrameLayout>
 
         <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/jobs_swipe_refresh_layout"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/border_job"
+            android:padding="8dp"
+            app:layout_constraintTop_toBottomOf="@id/data_profile_linear_layout">
+
+            <androidx.core.widget.NestedScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fillViewport="true">
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="visible">
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/job_recycleView"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_margin="15dp"
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                        tools:context=".activity.MainActivity"
+                        tools:listitem="@layout/job" />
+
+                    <TextView
+                        android:id="@+id/empty_my_jobs_list_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:text="List of your jobs is empty"
+                        android:visibility="gone" />
+                </FrameLayout>
+            </androidx.core.widget.NestedScrollView>
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
             android:id="@+id/post_swipe_refresh_layout"
             android:layout_width="match_parent"
             android:layout_height="600dp"
             android:layout_marginTop="16dp"
             android:background="@drawable/border_post"
             android:padding="8dp"
-            app:layout_constraintTop_toBottomOf="@id/data_profile">
+            app:layout_constraintTop_toBottomOf="@id/jobs_swipe_refresh_layout">
 
             <androidx.core.widget.NestedScrollView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:fillViewport="true"
-                >
+                android:fillViewport="true">
+
                 <FrameLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"

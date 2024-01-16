@@ -5,9 +5,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import com.example.netologyandroidhomework1.AndroidUtils
+import com.example.netologyandroidhomework1.RevealAnimationSetting
 import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.FragmentSavePostBinding
 import ru.netology.nmedia.dto.Post
@@ -15,15 +18,17 @@ import ru.netology.nmedia.viewModel.PostViewModel
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
+import ru.netology.nmedia.dto.Note
 import ru.netology.nmedia.model.ErrorCallback
 import ru.netology.nmedia.viewModel.PostViewModelFactory
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class SavePostFragment : Fragment() {
+class SavePostFragment : DialogFragment() {
     @Inject
     lateinit var errorCallback:ErrorCallback
     private var editedPost:Post? = null
+    private var revealAnimationSetting:RevealAnimationSetting? = null
     private val postViewModel: PostViewModel by viewModels<PostViewModel>(
         extrasProducer = {
             defaultViewModelCreationExtras.withCreationCallback<
@@ -36,7 +41,12 @@ class SavePostFragment : Fragment() {
         super.onCreate(savedInstanceState)
         arguments?.let {
             editedPost = it.getSerializable("post") as Post?
+            revealAnimationSetting = it.getSerializable("revealAnimationSetting") as RevealAnimationSetting
         }
+        setStyle(
+            DialogFragment.STYLE_NORMAL,
+            R.style.FullScreenDialogStyle
+        );
     }
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -48,12 +58,11 @@ class SavePostFragment : Fragment() {
             feedModel.run {
                 savePostFragmentBinding.apply {
                     progressBar.isVisible = loading
-                    mainLayoutSavePost.isVisible = loading
                 }
                 error?.let {
                     errorCallback.onError(it.reason, it.onRetryListener)
                 }
-                if(isPostCreated){
+                if(isSaved){
                     findNavController().popBackStack()
                 }
             }
@@ -72,14 +81,13 @@ class SavePostFragment : Fragment() {
                     Snackbar.make(savePostFragmentBinding.root,"Контент не может быть пустым",Snackbar.LENGTH_INDEFINITE).setAction(android.R.string.ok){
                     }.show()
                 else {
-                    postViewModel.createPost(editText.text.toString())
+                    postViewModel.savePost(Post(content = editText.text.toString()))
                 }
             }
         } else {
             editedPost?.let {post->
                 button.setIconResource(R.drawable.baseline_save_as_24)
                 button.text = "EDIT"
-                savePostFragmentBinding.updateContentText.text =post.content
                 editText.setText(post.content)
                 savePostFragmentBinding.linearLayoutUpdate.visibility = View.VISIBLE
                 button.setOnClickListener {
@@ -91,7 +99,7 @@ class SavePostFragment : Fragment() {
                         ).setAction(android.R.string.ok) {
                         }.show()
                     } else {
-                        postViewModel.update(post.copy(content = editText.text.toString()))
+                        postViewModel.savePost(post.copy(content = editText.text.toString()))
                     }
                 }
                 cancelButton.setOnClickListener {
@@ -99,6 +107,9 @@ class SavePostFragment : Fragment() {
                 }
             }
         }
+        AndroidUtils.registerCircularRevealAnimation(requireContext(),savePostFragmentBinding.root,revealAnimationSetting!!,
+            requireContext().getColor(R.color.black),requireContext().getColor(R.color.white),
+        )
         return savePostFragmentBinding.root
     }
 }

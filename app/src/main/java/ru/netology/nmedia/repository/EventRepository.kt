@@ -31,7 +31,7 @@ class EventRepository @Inject constructor(
 ) : Repository<Event> {
 
     @OptIn(ExperimentalPagingApi::class)
-    override val data: Flow<PagingData<Event>> = Pager(
+    val data: Flow<PagingData<Event>> = Pager(
         config = PagingConfig(pageSize = 10, enablePlaceholders = false, initialLoadSize = 10),
         remoteMediator = EventRemoteMediator(retrofitService, appDb, dao, daoRemoteKey, profileDao),
         pagingSourceFactory = dao::pagingSource
@@ -40,8 +40,8 @@ class EventRepository @Inject constructor(
             it.toDto()
         }
     }
-    override suspend fun like(likedPost: Event, token: String?) {
-        val response = retrofitService.likeEventById(likedPost.id, token)
+    override suspend fun like(liked: Event, token: String?) {
+        val response = retrofitService.likeEventById(liked.id, token)
         if (!response.isSuccessful) {
             val error: ErrorResponse? =
                 Gson().fromJson(
@@ -55,8 +55,8 @@ class EventRepository @Inject constructor(
             }
     }
 
-    override suspend fun dislike(dislikedPost: Event, token: String?) {
-        val response = retrofitService.dislikeEventById(dislikedPost.id, token)
+    override suspend fun dislike(disliked: Event, token: String?) {
+        val response = retrofitService.dislikeEventById(disliked.id, token)
         if (!response.isSuccessful) {
             val error: ErrorResponse? =
                 Gson().fromJson(
@@ -70,24 +70,17 @@ class EventRepository @Inject constructor(
                 dao.insert(EventEntity.fromDto(it))
             }
     }
-
-    fun share(id: Int) {
-    }
-
-    override suspend fun remove(event: Event, token: String?) {
-        dao.removeById(event.id)
-        val response = retrofitService.removeEventById(event.id, token)
+    override suspend fun remove(removed: Event, token: String?) {
+        dao.removeById(removed.id)
+        val response = retrofitService.removeEventById(removed.id, token)
         if (!response.isSuccessful)
             throw Exception("Request is not successful")
     }
 
-    override suspend fun createPost(content: String, link: String?, token: String?) {
-        TODO("Not yet implemented")
+    override suspend fun save(saved: Event, token: String?) {
+
     }
 
-    override suspend fun update(post: Post,token: String?) {
-        TODO("Not yet implemented")
-    }
     /*
     suspend fun createPost(content: String) {
         val response = retrofitService.savePost(
