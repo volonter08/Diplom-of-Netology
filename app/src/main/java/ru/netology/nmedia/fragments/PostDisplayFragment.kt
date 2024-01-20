@@ -2,25 +2,23 @@ package ru.netology.nmedia.fragments
 
 import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
+import android.annotation.SuppressLint
+import android.graphics.Point
 import android.os.Bundle
-import android.os.Parcelable
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.LinearInterpolator
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.commit
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
-import com.example.netologyandroidhomework1.AndroidUtils
-import com.example.netologyandroidhomework1.Dismissible
 import com.example.netologyandroidhomework1.RevealAnimationSetting
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
@@ -40,7 +38,6 @@ import ru.netology.nmedia.viewModel.EventViewModel
 import ru.netology.nmedia.viewModel.PostViewModel
 import ru.netology.nmedia.viewModel.PostViewModelFactory
 import javax.inject.Inject
-import kotlin.concurrent.thread
 
 
 @AndroidEntryPoint
@@ -48,7 +45,7 @@ class PostDisplayFragment : Fragment() {
     @Inject
     lateinit var errorCallback: ErrorCallback
 
-    lateinit var viewBinding:FragmentPostDisplayBinding
+    lateinit var viewBinding: FragmentPostDisplayBinding
     private val postViewModel: PostViewModel by viewModels<PostViewModel>(
         extrasProducer = {
             defaultViewModelCreationExtras.withCreationCallback<
@@ -58,7 +55,9 @@ class PostDisplayFragment : Fragment() {
         }
     )
 
-    private val eventViewModel: EventViewModel by activityViewModels()
+    private val eventViewModel: EventViewModel by viewModels()
+
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -84,10 +83,6 @@ class PostDisplayFragment : Fragment() {
                 }
             }
 
-            override fun onShareCLick(note: Note) {
-
-            }
-
             override fun onRemoveClick(removedNote: Note) {
                 removedNote.run {
                     when (this) {
@@ -97,13 +92,28 @@ class PostDisplayFragment : Fragment() {
                 }
             }
 
-            override fun onUpdateCLick(note: Note) {
-
+            override fun onUpdateCLick(note: Note, point: Point) {
+                note.run {
+                    when (this) {
+                        is Post -> showSavePostFragment(point)
+                        is Event -> showSaveEventFragment(point)
+                    }
+                }
             }
-            override fun onPostAuthorClick(authorId:Int) {
-                findNavController().navigate(R.id.action_postDisplayFragment_to_userFragment,
+
+            override fun onPostAuthorClick(authorId: Int) {
+                findNavController().navigate(
+                    R.id.action_postDisplayFragment_to_userFragment,
                     bundleOf("user_id" to authorId)
                 )
+            }
+
+            override fun onParticipate(eventId: Int) {
+                eventViewModel.participate(eventId)
+            }
+
+            override fun onUnparticipate(eventId: Int) {
+                eventViewModel.unparticipate(eventId)
             }
         }
         val postAdapter = PostAdapter(context = requireContext(), onButtonTouchListener)
@@ -131,7 +141,6 @@ class PostDisplayFragment : Fragment() {
                 eventViewModel.data.collectLatest {
                     eventAdapter.submitData(it)
                 }
-
             }
         }
         viewLifecycleOwner.lifecycleScope.launch {
@@ -148,17 +157,10 @@ class PostDisplayFragment : Fragment() {
                 }
             }
         }
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                postViewModel.auth.authStateFlow.collectLatest {
-                    postAdapter.refresh()
-                }
-            }
-        }
         eventViewModel.dataState.observe(viewLifecycleOwner) { feedModel ->
             feedModel.run {
                 viewBinding.progressBar.isVisible = loading
-                viewBinding.eventSwipeRefreshLayout.isRefreshing = isRefreshed
+                viewBinding.eventSwipeRefreshLayout.isRefreshing = isRefreshing
                 error?.let {
                     errorCallback.onError(it.reason, it.onRetryListener)
                 }
@@ -167,7 +169,9 @@ class PostDisplayFragment : Fragment() {
         postViewModel.dataState.observe(viewLifecycleOwner) { feedModel ->
             feedModel.run {
                 viewBinding.progressBar.isVisible = loading
-                viewBinding.postSwipeRefreshLayout.isRefreshing = isRefreshed
+                if (isRefreshing)
+                    postAdapter.refresh()
+                viewBinding.postSwipeRefreshLayout.isRefreshing = isRefreshing
                 error?.let {
                     errorCallback.onError(it.reason, it.onRetryListener)
                 }
@@ -178,6 +182,8 @@ class PostDisplayFragment : Fragment() {
                 eventAdapter.loadStateFlow.collectLatest { state ->
                     viewBinding.eventSwipeRefreshLayout.isRefreshing =
                         state.refresh is LoadState.Loading
+                    if (state.refresh != LoadState.Loading)
+                        postViewModel.invalidateDataState()
                 }
             }
         }
@@ -189,11 +195,17 @@ class PostDisplayFragment : Fragment() {
                 }
             }
         }
-        viewBinding.createPostButton.setOnClickListener {
-            showSavePostFragment()
+        viewBinding.createPostButton.setOnTouchListener { view, motionEvent ->
+            return@setOnTouchListener if (motionEvent.action == MotionEvent.ACTION_DOWN) {
+                showSavePostFragment(Point(motionEvent.rawX.toInt(), motionEvent.rawY.toInt()))
+                true
+            } else false
         }
-        viewBinding.createEventButton.setOnClickListener {
-            showSaveEventFragment()
+        viewBinding.createEventButton.setOnTouchListener { view, motionEvent ->
+            return@setOnTouchListener if (motionEvent.action == MotionEvent.ACTION_DOWN) {
+                showSaveEventFragment(Point(motionEvent.rawX.toInt(), motionEvent.rawY.toInt()))
+                true
+            } else false
         }
         viewBinding.buttonSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
             if (isChecked) {
@@ -220,27 +232,27 @@ class PostDisplayFragment : Fragment() {
         }
         return viewBinding.root
     }
-    fun showSavePostFragment() {
+
+    fun showSavePostFragment(point: Point) {
         findNavController().navigate(
             R.id.action_postDisplayFragment_to_savePostFragment,
-            bundleOf("revealAnimationSetting" to constructRevealSettings())
-        )
-    }
-    fun showSaveEventFragment() {
-        findNavController().navigate(
-            R.id.action_postDisplayFragment_to_saveEventFragment,
-            bundleOf("revealAnimationSetting" to constructRevealSettings())
-        )
-    }
-    private fun constructRevealSettings(): RevealAnimationSetting? {
-        val addFab = viewBinding.createPostButton
-        val containerView = viewBinding.root
-        return RevealAnimationSetting(
-            (addFab.x + addFab.width / 2).toInt(),
-            (addFab.y + addFab.height / 2).toInt(),
-            containerView.width,
-            containerView.height
+            bundleOf("revealAnimationSetting" to constructRevealSettings(point))
         )
     }
 
+    fun showSaveEventFragment(point: Point) {
+        findNavController().navigate(
+            R.id.action_postDisplayFragment_to_saveEventFragment,
+            bundleOf("revealAnimationSetting" to constructRevealSettings(point = point))
+        )
+    }
+
+    private fun constructRevealSettings(point: Point): RevealAnimationSetting? {
+        return RevealAnimationSetting(
+            point.x,
+            point.y,
+            viewBinding.root.width,
+            viewBinding.root.height
+        )
+    }
 }

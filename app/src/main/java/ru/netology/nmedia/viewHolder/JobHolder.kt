@@ -1,5 +1,7 @@
 package ru.netology.nmedia.viewHolder
 
+import android.annotation.SuppressLint
+import android.graphics.Point
 import android.os.Build
 import android.widget.PopupMenu
 import androidx.core.view.isVisible
@@ -7,23 +9,23 @@ import androidx.recyclerview.widget.RecyclerView
 import ru.netology.nmedia.OnButtonTouchListener
 import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.JobBinding
-import ru.netology.nmedia.databinding.PostBinding
 import ru.netology.nmedia.dto.Job
-import ru.netology.nmedia.dto.Post
+import java.text.SimpleDateFormat
 
 class JobHolder(
     val binding: JobBinding,
     val listener: OnButtonTouchListener
 ) : RecyclerView.ViewHolder(binding.root) {
 
+    @SuppressLint("ClickableViewAccessibility")
     fun bind(job: Job) {
         binding.apply {
             nameJob.text = job.name
             positionJob.text = job.position
-            startJob.text = job.start
+            startJob.text = SimpleDateFormat("dd MMM yyyy").format(job.start)
             finishJob.isVisible = job.finish !=null
             job.finish?.let {
-                finishJob.text = it
+                finishJob.text = SimpleDateFormat("dd MMM yyyy").format(it)
             }
             linkJob.isVisible = job.link!=null
             job.link?.let{
@@ -32,8 +34,8 @@ class JobHolder(
             }
             menu.apply {
                 isVisible = job.ownedMe
-                setOnClickListener {
-                    PopupMenu(it.context, it).apply {
+                setOnTouchListener {view,motionEvent->
+                    PopupMenu(view.context, view).apply {
                         inflate(R.menu.options)
                         setOnMenuItemClickListener {
                             when (it.itemId) {
@@ -43,7 +45,9 @@ class JobHolder(
                                 }
 
                                 R.id.update -> {
-                                    listener.onUpdateCLick(job)
+                                    listener.onUpdateCLick(job,
+                                        Point(motionEvent.rawX.toInt(),motionEvent.rawY.toInt())
+                                    )
                                     true
                                 }
 
@@ -54,6 +58,7 @@ class JobHolder(
                             setForceShowIcon(true)
 
                     }.show()
+                    return@setOnTouchListener true
                 }
             }
         }

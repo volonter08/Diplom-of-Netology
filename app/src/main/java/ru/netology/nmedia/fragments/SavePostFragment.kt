@@ -20,6 +20,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 import ru.netology.nmedia.dto.Note
 import ru.netology.nmedia.model.ErrorCallback
+import ru.netology.nmedia.requests.PostCreateRequest
 import ru.netology.nmedia.viewModel.PostViewModelFactory
 import javax.inject.Inject
 
@@ -81,7 +82,7 @@ class SavePostFragment : DialogFragment() {
                     Snackbar.make(savePostFragmentBinding.root,"Контент не может быть пустым",Snackbar.LENGTH_INDEFINITE).setAction(android.R.string.ok){
                     }.show()
                 else {
-                    postViewModel.savePost(Post(content = editText.text.toString()))
+                    postViewModel.savePost(PostCreateRequest(content = editText.text.toString()))
                 }
             }
         } else {
@@ -99,7 +100,7 @@ class SavePostFragment : DialogFragment() {
                         ).setAction(android.R.string.ok) {
                         }.show()
                     } else {
-                        postViewModel.savePost(post.copy(content = editText.text.toString()))
+                        postViewModel.savePost(PostCreateRequest(post.copy(content = editText.text.toString())))
                     }
                 }
                 cancelButton.setOnClickListener {

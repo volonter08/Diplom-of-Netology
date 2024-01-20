@@ -1,5 +1,6 @@
 package ru.netology.nmedia.fragments
 
+import android.graphics.Point
 import android.graphics.drawable.AnimatedImageDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,12 +8,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
 import com.bumptech.glide.Glide
 import dagger.hilt.android.AndroidEntryPoint
@@ -23,12 +22,10 @@ import ru.netology.nmedia.OnButtonTouchListener
 import ru.netology.nmedia.R
 import ru.netology.nmedia.adapter.JobAdapter
 import ru.netology.nmedia.adapter.PostAdapter
-import ru.netology.nmedia.databinding.FragmentProfileBinding
 import ru.netology.nmedia.databinding.FragmentUserBinding
 import ru.netology.nmedia.dto.Event
 import ru.netology.nmedia.dto.Note
 import ru.netology.nmedia.dto.Post
-import ru.netology.nmedia.dto.User
 import ru.netology.nmedia.model.ErrorCallback
 import ru.netology.nmedia.viewModel.JobViewModel
 import ru.netology.nmedia.viewModel.JobViewModelFactory
@@ -108,11 +105,6 @@ class UserFragment : Fragment() {
                     }
                 }
             }
-
-            override fun onShareCLick(note: Note) {
-
-            }
-
             override fun onRemoveClick(removedNote: Note) {
                 removedNote.run {
                     when (this) {
@@ -122,10 +114,19 @@ class UserFragment : Fragment() {
                 }
             }
 
-            override fun onUpdateCLick(note: Note) {
-
+            override fun onUpdateCLick(note: Note, point: Point) {
+                TODO("Not yet implemented")
             }
+
             override fun onPostAuthorClick(authorId: Int) {
+            }
+
+            override fun onParticipate(eventId: Int) {
+                TODO("Not yet implemented")
+            }
+
+            override fun onUnparticipate(eventId: Int) {
+                TODO("Not yet implemented")
             }
         }
         val postAdapter = PostAdapter(context = requireContext(), onButtonTouchListener)
@@ -152,14 +153,14 @@ class UserFragment : Fragment() {
         }
         postViewModel.dataState.observe(viewLifecycleOwner) { feedModel ->
             feedModel.run {
-                userFragmentBinding.postSwipeRefreshLayout.isRefreshing = isRefreshed
+                userFragmentBinding.postSwipeRefreshLayout.isRefreshing = isRefreshing
                 error?.let {
                     errorCallback.onError(it.reason, it.onRetryListener)
                 }
             }
         }
         jobViewModel.dataState.observe(viewLifecycleOwner){feedModel->
-            userFragmentBinding.jobsSwipeRefreshLayout.isRefreshing = feedModel.isRefreshed
+            userFragmentBinding.jobsSwipeRefreshLayout.isRefreshing = feedModel.isRefreshing
             feedModel.error?.let {
                 errorCallback.onError(it.reason, it.onRetryListener)
             }

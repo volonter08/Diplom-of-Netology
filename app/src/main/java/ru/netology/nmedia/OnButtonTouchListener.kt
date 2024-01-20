@@ -1,13 +1,15 @@
 package ru.netology.nmedia
 
+import android.graphics.Point
+import android.view.MotionEvent
 import ru.netology.nmedia.dto.Note
-import ru.netology.nmedia.dto.Post
 
 interface OnButtonTouchListener {
     fun onLikeCLick(likedNote: Note)
     fun onDislikeCLick(dislikedNote:Note)
-    fun onShareCLick(note: Note)
     fun onRemoveClick(removedNote:Note)
-    fun onUpdateCLick(note: Note)
+    fun onUpdateCLick(note: Note,point: Point)
     fun onPostAuthorClick(authorId:Int)
+    fun onParticipate(eventId:Int)
+    fun onUnparticipate(eventId: Int)
 }

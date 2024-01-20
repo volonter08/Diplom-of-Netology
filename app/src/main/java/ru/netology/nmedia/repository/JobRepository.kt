@@ -7,13 +7,14 @@ import ru.netology.nmedia.JobApiService
 import ru.netology.nmedia.db.AppDb
 import ru.netology.nmedia.dto.Job
 import ru.netology.nmedia.entity.MyJobEntity
+import ru.netology.nmedia.requests.JobCreateRequest
 import ru.netology.nmedia.responses.ErrorResponse
 
 abstract class JobRepository constructor(
     protected val appDb: AppDb? = null,
     protected val jobApiService: JobApiService,
     protected val userId: Int
-):Repository<Job>{
+):Repository<Job,JobCreateRequest>{
 
     abstract val data: Flow<List<Job>>
 
@@ -22,9 +23,9 @@ abstract class JobRepository constructor(
     }
     override suspend fun dislike(disliked: Job, token: String?) {
     }
-    override suspend fun save(saved: Job, token: String?) {
+    override suspend fun save(createRequest: JobCreateRequest, token: String?) {
         val response = jobApiService.saveJobs(
-            token,saved
+            token,createRequest
         )
         if (!response.isSuccessful) {
             val error: ErrorResponse? =

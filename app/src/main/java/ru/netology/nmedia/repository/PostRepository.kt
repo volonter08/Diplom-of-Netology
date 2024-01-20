@@ -15,7 +15,7 @@ import ru.netology.nmedia.responses.ErrorResponse
 abstract class PostRepository constructor(
     val appDb: AppDb? = null,
     val retrofitService: PostApiService
-) : Repository<Post> {
+) : Repository<Post,PostCreateRequest> {
     abstract val data: Flow<PagingData<Post>>
     override suspend fun like(liked: Post, token: String?) {
         val response = retrofitService.likePostById(liked.id, token)
@@ -54,10 +54,6 @@ abstract class PostRepository constructor(
 
             }
     }
-
-    fun share(id: Int) {
-    }
-
     override suspend fun remove(removed: Post, token: String?) {
         val response = retrofitService.removePostById(removed.id, token)
         if (!response.isSuccessful) {
@@ -74,16 +70,9 @@ abstract class PostRepository constructor(
             }
     }
 
-    override suspend fun save(saved:Post,token:String?) {
+    override suspend fun save(createRequest:PostCreateRequest, token:String?) {
         val response = retrofitService.savePost(
-            PostCreateRequest(
-                id = saved.id,
-                content = saved.content,
-                coords = saved.coords,
-                link = saved.link,
-                attachment = saved.attachment,
-                mentionIds = saved.mentionIds
-            ),token
+            createRequest,token
         )
         if (!response.isSuccessful) {
             val error: ErrorResponse? =

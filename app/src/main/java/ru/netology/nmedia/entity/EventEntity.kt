@@ -17,8 +17,8 @@ data class EventEntity(
     val authorAvatar: String?,
     val authorJob:String?,
     val content: String?,
-    val datetime: Date?,
-    val published: Date?,
+    val datetime: Date,
+    val published: Date,
     @Embedded
     val coords: CoordinatesEmbeddable?=null,
     val typev: TypeOnline,
@@ -37,7 +37,7 @@ data class EventEntity(
 
     companion object {
         fun fromDto(dto: Event) =dto.run{
-            EventEntity(id, authorId, author, authorAvatar, authorJob, content, datetime, published, CoordinatesEmbeddable.fromDto(coords),type, link, likeOwnerIds,likedByMe,speakerIds,participantsIds,participatedByMe, AttachmentEmbeddable.fromDto(attachment), ownedByMe, users)
+            EventEntity(id, authorId, author, authorAvatar, authorJob, content, datetime, published =  published, CoordinatesEmbeddable.fromDto(coords),type, link, likeOwnerIds,likedByMe,speakerIds,participantsIds,participatedByMe, AttachmentEmbeddable.fromDto(attachment), ownedByMe, users)
         }
 
     }

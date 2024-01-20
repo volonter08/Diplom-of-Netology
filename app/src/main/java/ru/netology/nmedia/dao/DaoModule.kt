@@ -46,5 +46,5 @@ object DaoModule {
     fun provideMyJobDao(db:AppDb):MyJobDao = db.myJobDao()
     @Provides
     @Singleton
-    fun provideLiveDataProfile(auth: AppAuth):LiveData<Profile> = auth.authStateFlow.asLiveData(Dispatchers.Default)
+    fun provideLiveDataProfile(auth: AppAuth):LiveData<Profile> = auth.authStateFlow.asLiveData()
 }

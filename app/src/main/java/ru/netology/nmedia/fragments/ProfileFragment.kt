@@ -1,5 +1,6 @@
 package ru.netology.nmedia.fragments
 
+import android.graphics.Point
 import android.graphics.drawable.AnimatedImageDrawable
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -39,17 +40,6 @@ import ru.netology.nmedia.viewModel.PostViewModelFactory
 import ru.netology.nmedia.viewModel.ProfileViewModel
 import javax.inject.Inject
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val LOGIN = "login"
-private const val NAME = "name"
-private const val AVATAR = "avatar"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [ProfileFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 @AndroidEntryPoint
 class ProfileFragment : Fragment() {
     @Inject
@@ -57,11 +47,7 @@ class ProfileFragment : Fragment() {
 
     @Inject
     lateinit var dataMyProfile: LiveData<Profile>
-
-    // TODO: Rename and change types of parameters
-    private var login: String? = null
-    private var name: String? = null
-    private var avatar: String? = null
+    lateinit var profileFragmentBinding: FragmentProfileBinding
     private val profileViewModel: ProfileViewModel by viewModels()
     private val authViewModel: AuthViewModel by activityViewModels()
     private val postViewModel: PostViewModel by viewModels<PostViewModel>(
@@ -84,9 +70,7 @@ class ProfileFragment : Fragment() {
         super.onCreate(savedInstanceState)
 
         arguments?.let {
-            login = it.getString(LOGIN)
-            name = it.getString(NAME)
-            avatar = it.getString(AVATAR)
+
         }
     }
 
@@ -112,11 +96,6 @@ class ProfileFragment : Fragment() {
                     }
                 }
             }
-
-            override fun onShareCLick(note: Note) {
-
-            }
-
             override fun onRemoveClick(removedNote: Note) {
                 removedNote.run {
                     when (this) {
@@ -127,18 +106,26 @@ class ProfileFragment : Fragment() {
                     }
                 }
 
-            override fun onUpdateCLick(note: Note) {
+            override fun onUpdateCLick(note: Note, point: Point) {
                 TODO("Not yet implemented")
             }
-
 
             override fun onPostAuthorClick(authorId: Int) {
                 TODO("Not yet implemented")
             }
+
+            override fun onParticipate(eventId: Int) {
+                TODO("Not yet implemented")
+            }
+
+            override fun onUnparticipate(eventId: Int) {
+                TODO("Not yet implemented")
+            }
         }
 
-        val profileFragmentBinding =
+        profileFragmentBinding =
             FragmentProfileBinding.inflate(layoutInflater, container, false)
+        //Initialise adapters
         val postAdapter = PostAdapter(context = requireContext(), onButtonTouchListener)
         val jobAdapter = JobAdapter(onButtonTouchListener)
         dataMyProfile.observe(viewLifecycleOwner) {
@@ -172,7 +159,7 @@ class ProfileFragment : Fragment() {
         }
         jobViewModel.dataState.observe(viewLifecycleOwner) {
             profileFragmentBinding.progressBarLayout.isVisible = it.loading
-            profileFragmentBinding.jobsSwipeRefreshLayout.isRefreshing = it.isRefreshed
+            profileFragmentBinding.jobsSwipeRefreshLayout.isRefreshing = it.isRefreshing
             it.error?.let {
                 errorCallback.onError(it.reason, it.onRetryListener)
             }
@@ -186,15 +173,14 @@ class ProfileFragment : Fragment() {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 postViewModel.data.collectLatest {
                     postAdapter.submitData(it)
-                    profileFragmentBinding.emptyMyPostListText.isVisible =
-                        postAdapter.itemCount == 0
                 }
             }
         }
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                postViewModel.auth.authStateFlow.collectLatest {
-                    postAdapter.refresh()
+                postAdapter.onPagesUpdatedFlow.collectLatest {
+                    profileFragmentBinding.emptyMyPostListText.isVisible =
+                        postAdapter.itemCount == 0
                 }
             }
         }
@@ -210,34 +196,12 @@ class ProfileFragment : Fragment() {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 jobViewModel.data.collectLatest {
                     jobAdapter.submitList(it)
-                    profileFragmentBinding.emptyMyPostListText.isVisible = it.isEmpty()
+                    profileFragmentBinding.emptyMyJobsListText.isVisible = it.isEmpty()
                 }
             }
         }
-
         profileFragmentBinding.postSwipeRefreshLayout.setOnRefreshListener(postAdapter::refresh)
         profileFragmentBinding.jobsSwipeRefreshLayout.setOnRefreshListener(jobViewModel::loadJobs)
         return profileFragmentBinding.root
-    }
-
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment ProfileFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(login: String, name: String, avatar: String) =
-            ProfileFragment().apply {
-                arguments = Bundle().apply {
-                    putString(LOGIN, login)
-                    putString(NAME, name)
-                    putString(AVATAR, avatar)
-                }
-            }
     }
 }

@@ -15,6 +15,8 @@ import ru.netology.nmedia.dto.Event
 import ru.netology.nmedia.dto.Job
 import ru.netology.nmedia.dto.User
 import ru.netology.nmedia.requests.AuthenticationRequest
+import ru.netology.nmedia.requests.EventCreateRequest
+import ru.netology.nmedia.requests.JobCreateRequest
 import ru.netology.nmedia.responses.Token
 
 interface AuthApiService {
@@ -30,7 +32,7 @@ interface AuthApiService {
 }
 interface JobApiService{
 
-    suspend fun saveJobs(token: String?,job: Job):Response<Job>
+    suspend fun saveJobs(token: String?,job: JobCreateRequest):Response<Job>
     suspend fun removeJobs( token: String?, jobId:Int):Response<Unit>
 
 }
@@ -38,7 +40,7 @@ interface MyJobApiService:JobApiService{
     @GET("api/my/jobs")
     suspend fun getMyJobs(@Header("Authorization") token: String?): Response<List<Job>>
     @POST("api/my/jobs")
-    override suspend fun saveJobs(@Header("Authorization") token: String?,@Body job: Job):Response<Job>
+    override suspend fun saveJobs(@Header("Authorization") token: String?,@Body job: JobCreateRequest):Response<Job>
     @DELETE("api/my/jobs/{job_id}")
     override suspend fun removeJobs(@Header("Authorization") token: String?,@Path("job_id") jobId:Int):Response<Unit>
 
@@ -185,7 +187,7 @@ interface EventApiService {
 
     //CRUD events
     @POST("api/events")
-    suspend fun saveEvent(@Body event: Event): Response<Event>
+    suspend fun saveEvent(@Body event: EventCreateRequest,@Header("Authorization") token: String?): Response<Event>
 
     @DELETE("api/events/{id}")
     suspend fun removeEventById(
@@ -204,7 +206,16 @@ interface EventApiService {
         @Path("id") id: Int,
         @Header("Authorization") token: String?
     ): Response<Event>
-
+    @POST("api/events/{id}/participants")
+    suspend fun participate(
+        @Header("Authorization") token: String?,
+        @Path("id") id: Int
+    ):Response<Event>
+    @DELETE("api/events/{id}/participants")
+    suspend fun unparticipate(
+        @Header("Authorization") token: String?,
+        @Path("id") id: Int
+    ):Response<Event>
     suspend fun getNewerEvents(id: Int, token: String?): Response<List<Event>>
     suspend fun getBeforeEvent(
         id: Int,

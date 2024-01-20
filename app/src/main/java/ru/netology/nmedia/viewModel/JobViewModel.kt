@@ -20,6 +20,7 @@ import ru.netology.nmedia.auth.AppAuth
 import ru.netology.nmedia.dao.ProfileDao
 import ru.netology.nmedia.dto.Job
 import ru.netology.nmedia.repository.JobRepository
+import ru.netology.nmedia.requests.JobCreateRequest
 import ru.netology.nmedia.responses.Error
 
 @HiltViewModel(assistedFactory = JobViewModelFactory::class)
@@ -48,7 +49,7 @@ class JobViewModel @AssistedInject constructor(
     fun loadJobs() {
         viewModelScope.launch {
             try {
-                _dataState.value = FeedModelState(isRefreshed = true)
+                _dataState.value = FeedModelState(isRefreshing = true)
                 repository.loadJobs(profileDao.getAccessToken())
                 _dataState.value = FeedModelState()
             }
@@ -72,15 +73,15 @@ class JobViewModel @AssistedInject constructor(
         }
     }
 
-    fun save(job:Job) {
+    fun save(jobCreateRequest:JobCreateRequest) {
         viewModelScope.launch {
             try {
                 _dataState.value = FeedModelState(loading = true)
-                repository.save(job, token = profileDao.getAccessToken())
+                repository.save(jobCreateRequest, token = profileDao.getAccessToken())
                 _dataState.value = FeedModelState(isSaved = true)
             } catch (e: Exception) {
                 onError(e.message ?: "") {
-                   save(job)
+                   save(jobCreateRequest)
                 }
             }
         }

@@ -1,17 +1,23 @@
 package ru.netology.nmedia.requests
 
+import android.icu.text.SimpleDateFormat
 import ru.netology.nmedia.dto.Coordinates
+import ru.netology.nmedia.dto.Event
+import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.model.Attachment
 import ru.netology.nmedia.model.TypeOnline
 import java.util.Date
 
 data class EventCreateRequest(
     override val id: Int = 0,
-    override val content: String,
-    val dateTime:Date,
-    override val coords: Coordinates? = null,
-    val type:TypeOnline,
-    override val link: String? = null,
-    override val attachment: Attachment? = null,
-    override val mentionIds: List<Int> = emptyList()
-):NoteCreateRequest(id, content, coords, link, attachment, mentionIds)
+    val content: String,
+    val datetime:String,
+    val coords: Coordinates? = null,
+    val type:TypeOnline = TypeOnline.ONLINE,
+    val link: String? = null,
+    val attachment: Attachment? = null,
+    val speakerIds: List<Int> = emptyList()
+):NoteCreateRequest(){
+    constructor(event: Event):this(event.id,event.content,
+        SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").format(event.datetime),event.coords,event.type,event.link,event.attachment,event.speakerIds)
+}

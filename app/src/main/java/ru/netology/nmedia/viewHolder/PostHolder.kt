@@ -1,13 +1,14 @@
 package ru.netology.nmedia.viewHolder
 
+import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Point
 import android.graphics.drawable.AnimatedImageDrawable
 import android.icu.text.DateFormat
 import android.icu.text.SimpleDateFormat
 import android.net.Uri
 import android.os.Build
-import android.view.View
-import android.widget.ImageView
+import android.view.MotionEvent
 import android.widget.PopupMenu
 import androidx.core.view.isVisible
 import androidx.media3.common.MediaItem
@@ -28,6 +29,7 @@ class PostHolder(
     private val listener: OnButtonTouchListener
 ) : RecyclerView.ViewHolder(binding.root) {
 
+    @SuppressLint("ClickableViewAccessibility")
     fun bind(post: Post) {
         val avatarImageView = binding.avatar
         val authorTextView = binding.author
@@ -70,28 +72,33 @@ class PostHolder(
         }
         menuButton.apply {
             isVisible = post.ownedByMe
-            setOnClickListener {
-                PopupMenu(it.context, it).apply {
-                    inflate(R.menu.options)
-                    setOnMenuItemClickListener {
-                        when (it.itemId) {
-                            R.id.remove -> {
-                                listener.onRemoveClick(post)
-                                true
-                            }
+            setOnTouchListener{view,motionEvent->
+                val point =  Point(motionEvent.rawX.toInt(),motionEvent.rawY.toInt())
+                if (motionEvent.action== MotionEvent.ACTION_DOWN) {
+                    PopupMenu(view.context, view).apply {
+                        inflate(R.menu.options)
+                        setOnMenuItemClickListener {
+                            when (it.itemId) {
+                                R.id.remove -> {
+                                    listener.onRemoveClick(post)
+                                    true
+                                }
 
-                            R.id.update -> {
-                                listener.onUpdateCLick(post)
-                                true
-                            }
+                                R.id.update -> {
+                                    listener.onUpdateCLick(post,point)
+                                    true
+                                }
 
-                            else -> false
+                                else -> false
+                            }
                         }
-                    }
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
-                        setForceShowIcon(true)
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+                            setForceShowIcon(true)
 
-                }.show()
+                    }.show()
+                    return@setOnTouchListener true
+                }
+                return@setOnTouchListener false
             }
         }
         contentTextView.text = post.content
@@ -143,10 +150,6 @@ class PostHolder(
             }
             isChecked = post.likedByMe
         }
-        shareButton.setOnClickListener {
-            listener.onShareCLick(post)
-        }
         mentionedButton.text = ConverterCountFromIntToString.convertCount(post.mentionIds.size)
-        //println("visible_image_view:${binding.attachmentImage.isVisible} attachment = ${post.attachment} content: ${post.content} ")
     }
 }

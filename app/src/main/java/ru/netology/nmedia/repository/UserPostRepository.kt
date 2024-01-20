@@ -24,7 +24,7 @@ class UserPostsRepository @AssistedInject constructor(
     retrofitService: UserPostApiService,
     profileDao: ProfileDao
 ) : PostRepository( retrofitService= retrofitService) {
-    @OptIn(ExperimentalPagingApi::class)
+
     val invalidatingPagingSourceFactory = InvalidatingPagingSourceFactory{
         UserPostPagingSource(retrofitService,authorId,profileDao)
     }

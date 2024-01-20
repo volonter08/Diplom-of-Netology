@@ -25,6 +25,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import ru.netology.nmedia.databinding.FragmentSaveEventBinding
 import ru.netology.nmedia.dto.Event
 import ru.netology.nmedia.model.ErrorCallback
+import ru.netology.nmedia.requests.EventCreateRequest
 import ru.netology.nmedia.viewModel.EventViewModel
 import java.util.Date
 import javax.inject.Inject
@@ -70,7 +71,7 @@ class SaveEventFragment : DialogFragment() {
                 }
             }
         }
-        val editText = saveEventFragmentBinding.contentEditText.apply {
+        val contentEditText = saveEventFragmentBinding.contentEditText.apply {
             text.clear()
         }
         val button = saveEventFragmentBinding.save
@@ -80,21 +81,21 @@ class SaveEventFragment : DialogFragment() {
             button.setText("CREATE")
             saveEventFragmentBinding.linearLayoutUpdate.visibility = View.GONE
             button.setOnClickListener {
-                if (editText.text.isBlank())
+                if (contentEditText.text.isBlank())
                     Snackbar.make(saveEventFragmentBinding.root,"Контент не может быть пустым",Snackbar.LENGTH_INDEFINITE).setAction(android.R.string.ok){
                     }.show()
                 else {
-
+                    eventViewModel.saveEvent(EventCreateRequest(content = contentEditText.text.toString(), datetime = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").format(date)))
                 }
             }
         } else {
-            editedPost?.let {post->
+            editedPost?.let {event->
                 button.setIconResource(R.drawable.baseline_save_as_24)
                 button.text = "EDIT"
-                editText.setText(post.content)
+                contentEditText.setText(event.content)
                 saveEventFragmentBinding.linearLayoutUpdate.visibility = View.VISIBLE
                 button.setOnClickListener {
-                    if (editText.text.isBlank()) {
+                    if (contentEditText.text.isBlank()) {
                         Snackbar.make(
                             saveEventFragmentBinding.root,
                             "Контент не может быть пустым",
@@ -102,6 +103,7 @@ class SaveEventFragment : DialogFragment() {
                         ).setAction(android.R.string.ok) {
                         }.show()
                     } else {
+                        eventViewModel.saveEvent(EventCreateRequest(event.copy(content = contentEditText.text.toString(), datetime = date)))
                     }
                 }
                 cancelButton.setOnClickListener {
@@ -122,33 +124,31 @@ class SaveEventFragment : DialogFragment() {
         )
         return saveEventFragmentBinding.root
     }
-    fun showTimePickerDialog(){
-        TimePickerDialog(requireContext(), object :TimePickerDialog.OnTimeSetListener{
-            override fun onTimeSet(view: TimePicker?, hourOfDay: Int, minute: Int) {
+    private fun showTimePickerDialog(){
+        TimePickerDialog(requireContext(),
+            { _, hourOfDay, minute ->
                 date.apply {
                     hours = hourOfDay
                     minutes = minute
                 }
                 setTextTime()
-            }
-        }, date.hours, date.minutes, true).show()
+            }, date.hours, date.minutes, true).show()
     }
-    fun showDatePickerDialog(){
-        DatePickerDialog(requireContext(), object :DatePickerDialog.OnDateSetListener{
-            override fun onDateSet(view: DatePicker?, year: Int, month: Int, dayOfMonth: Int) {
+    private fun showDatePickerDialog(){
+        DatePickerDialog(requireContext(),
+            { _, year, month, dayOfMonth ->
                 date.apply {
                     date = dayOfMonth
                     this.month = month
                     this.year = year-1900
                 }
                 setTextDate()
-            }
-        },date.year + 1900 , date.month,date.day ).show()
+            },date.year + 1900 , date.month,date.day ).show()
     }
-    fun setTextTime(){
+    private fun setTextTime(){
         saveEventFragmentBinding.textTime.text= dateFormatOutTimeText.format(date)
     }
-    fun setTextDate(){
+    private fun setTextDate(){
         saveEventFragmentBinding.textDate.text= dateFormatOutDateText.format(date)
     }
 }

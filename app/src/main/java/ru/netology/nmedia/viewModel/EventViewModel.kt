@@ -17,8 +17,11 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import ru.netology.nmedia.FeedModelState
+import ru.netology.nmedia.dao.ProfileDao
 import ru.netology.nmedia.dto.Event
 import ru.netology.nmedia.repository.EventRepository
+import ru.netology.nmedia.requests.EventCreateRequest
+import ru.netology.nmedia.requests.PostCreateRequest
 import ru.netology.nmedia.responses.Error
 import javax.inject.Inject
 
@@ -26,7 +29,8 @@ import javax.inject.Inject
 class EventViewModel @Inject constructor(
     @ApplicationContext context: Context,
     private val repository: EventRepository,
-    val auth: AppAuth
+    val auth: AppAuth,
+    val profileDao: ProfileDao
 ) : ViewModel() {
     private val cached = repository
         .data
@@ -82,32 +86,41 @@ class EventViewModel @Inject constructor(
             }
         }
     }
-  /*
-    fun createPost(content: String) {
+    fun saveEvent(eventCreateRequest: EventCreateRequest) {
         viewModelScope.launch {
             try {
-                repository.createPost(content)
-            } catch (_: Exception) {
-                onError("Request is not succesfull") {
-                    createPost(content)
+                _dataState.value = FeedModelState(loading = true)
+                repository.save(eventCreateRequest,tokenAccess)
+                _dataState.value = FeedModelState(isSaved = true)
+            } catch (e: Exception) {
+                onError(e.message?:"") {
+                    saveEvent(eventCreateRequest)
                 }
             }
         }
     }
-
-    fun update(post: Post) {
+    fun participate(eventId:Int){
         viewModelScope.launch {
             try {
-                repository.update(post)
-            } catch (_: Exception) {
-                onError("Request is not succesfull") {
-                    update(post)
+                repository.participate(eventId,profileDao.getAccessToken())
+            } catch (e: Exception) {
+                onError(e.message?:"") {
+                    participate(eventId)
                 }
             }
         }
     }
-
-   */
+    fun unparticipate(eventId:Int){
+        viewModelScope.launch {
+            try {
+                repository.unparticipate(eventId,profileDao.getAccessToken())
+            } catch (e: Exception) {
+                onError(e.message?:"") {
+                    participate(eventId)
+                }
+            }
+        }
+    }
     private fun onError(reason: String, onRetryListener: OnRetryListener) {
         _dataState.value = FeedModelState(error = Error(reason, onRetryListener))
         _dataState.value = FeedModelState()

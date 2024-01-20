@@ -11,8 +11,8 @@ data class Event(
     val authorAvatar: String?= null,
     val authorJob: String? = null,
     val content: String,
-    val datetime: Date?,
-    val published: Date?,
+    val datetime: Date,
+    val published: Date,
     val coords: Coordinates? = null,
     val type: TypeOnline,
     val link: String? = null,
@@ -24,4 +24,4 @@ data class Event(
     val attachment: Attachment? = null,
     val ownedByMe: Boolean = false,
     val users: Map<String, UserPreview> = emptyMap()
-):Note
+):Note()

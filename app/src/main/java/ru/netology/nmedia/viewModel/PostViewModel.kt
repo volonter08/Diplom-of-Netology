@@ -5,9 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import androidx.paging.map
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -19,12 +17,12 @@ import ru.netology.nmedia.repository.PostRepository
 import kotlinx.coroutines.launch
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.collectLatest
 import ru.netology.nmedia.FeedModelState
 import ru.netology.nmedia.PostRepositoryEntryPoint
 import ru.netology.nmedia.dao.ProfileDao
+import ru.netology.nmedia.repository.AllPostsRepository
+import ru.netology.nmedia.requests.PostCreateRequest
 import ru.netology.nmedia.responses.Error
 
 @HiltViewModel(assistedFactory = PostViewModelFactory::class)
@@ -36,7 +34,6 @@ class PostViewModel @AssistedInject constructor(
     val profileDao: ProfileDao
 ) : ViewModel() {
 
-
     val entryPoint: PostRepositoryEntryPoint =
         EntryPointAccessors.fromApplication(context, PostRepositoryEntryPoint::class.java)
     val repository: PostRepository = when (authorId) {
@@ -44,24 +41,20 @@ class PostViewModel @AssistedInject constructor(
         -1 -> entryPoint.allPostRepository()
         else -> entryPoint.userPostRepositoryFactory().create(authorId)
     }
-    private val cached = repository
+    val data = repository
         .data
         .cachedIn(viewModelScope)
-
-    val data: Flow<PagingData<Post>> = auth.authStateFlow
-        .flatMapLatest { (myId, token, _, _, _) ->
-            cached.map { pagingData ->
-                pagingData.map { post ->
-                    post.copy(
-                        ownedByMe = post.authorId == myId,
-                        likedByMe = post.likeOwnerIds.contains(myId),
-                    )
-                }
-            }
-        }
     val _dataState: MutableLiveData<ru.netology.nmedia.FeedModelState> = MutableLiveData()
     val dataState: LiveData<ru.netology.nmedia.FeedModelState>
         get() = _dataState
+
+    init {
+        viewModelScope.launch {
+            auth.authStateFlow.collectLatest {
+                _dataState.value = FeedModelState(isRefreshing = true)
+            }
+        }
+    }
 
     fun like(likedPost: Post) {
         viewModelScope.launch {
@@ -87,36 +80,34 @@ class PostViewModel @AssistedInject constructor(
         }
     }
 
-    fun share(id: Int) {
-        repository.share(id)
-    }
-
     fun remove(post: Post) {
         viewModelScope.launch {
             try {
                 repository.remove(post, profileDao.getAccessToken())
             } catch (e: Exception) {
-                onError(e.message?:"") {
+                onError(e.message ?: "") {
                     remove(post)
                 }
             }
         }
     }
 
-    fun savePost(post:Post) {
+    fun savePost(postCreateRequest: PostCreateRequest) {
         viewModelScope.launch {
             try {
                 _dataState.value = FeedModelState(loading = true)
-                repository.save(post,profileDao.getAccessToken())
+                repository.save(postCreateRequest, profileDao.getAccessToken())
                 _dataState.value = FeedModelState(isSaved = true)
             } catch (e: Exception) {
-                onError(e.message?:"") {
-                    savePost(post)
+                onError(e.message ?: "") {
+                    savePost(postCreateRequest)
                 }
             }
         }
     }
-
+    fun invalidateDataState(){
+        _dataState.value = FeedModelState()
+    }
 
     private fun onError(reason: String, onRetryListener: OnRetryListener) {
         _dataState.value = FeedModelState(error = Error(reason, onRetryListener))
