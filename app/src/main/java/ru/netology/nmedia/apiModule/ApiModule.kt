@@ -11,7 +11,6 @@ import retrofit2.converter.gson.GsonConverterFactory
 import ru.netology.nmedia.AllEventsApiService
 import ru.netology.nmedia.AllPostApiService
 import ru.netology.nmedia.AuthApiService
-import ru.netology.nmedia.JobApiService
 import ru.netology.nmedia.MyJobApiService
 import ru.netology.nmedia.MyPostApiService
 import ru.netology.nmedia.UserJobApiService
@@ -21,7 +20,7 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object ApiModule {
-    const val BASE_URL = "https://netomedia.ru/"
+    private const val BASE_URL = "https://netomedia.ru/"
     @Provides
     @Singleton
     fun provideAuthService(): AuthApiService {

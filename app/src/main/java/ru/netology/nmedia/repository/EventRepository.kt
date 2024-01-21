@@ -5,10 +5,8 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
-import androidx.room.withTransaction
 import com.google.gson.Gson
 import ru.netology.nmedia.db.AppDb
-import ru.netology.nmedia.dto.Post
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import ru.netology.nmedia.AllEventsApiService
@@ -16,9 +14,7 @@ import ru.netology.nmedia.dao.EventDao
 import ru.netology.nmedia.dao.EventRemoteKeyDao
 import ru.netology.nmedia.dao.ProfileDao
 import ru.netology.nmedia.dto.Event
-import ru.netology.nmedia.entity.AllPostEntity
 import ru.netology.nmedia.entity.EventEntity
-import ru.netology.nmedia.entity.MyPostEntity
 import ru.netology.nmedia.remoteMediator.EventRemoteMediator
 import ru.netology.nmedia.requests.EventCreateRequest
 import ru.netology.nmedia.responses.ErrorResponse
@@ -31,7 +27,7 @@ class EventRepository @Inject constructor(
     private val dao: EventDao,
     daoRemoteKey: EventRemoteKeyDao,
     profileDao: ProfileDao,
-    val retrofitService: AllEventsApiService
+    private val retrofitService: AllEventsApiService
 ) : Repository<Event, EventCreateRequest> {
 
     @OptIn(ExperimentalPagingApi::class)

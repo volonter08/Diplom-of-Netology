@@ -13,8 +13,6 @@ interface EventDao {
     fun pagingSource(): PagingSource<Int, EventEntity>
     @Query("SELECT * FROM EventEntity ORDER BY id DESC")
     fun getAll(): LiveData<List<EventEntity>>
-    @Query("SELECT * FROM EventEntity ORDER BY id DESC LIMIT :count")
-    suspend fun getLatest(count:Int): List<EventEntity>
     @Query("SELECT COUNT(*) == 0 FROM EventEntity")
     suspend fun isEmpty(): Boolean
 

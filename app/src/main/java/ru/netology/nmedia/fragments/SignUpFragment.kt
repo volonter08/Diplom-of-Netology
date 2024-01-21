@@ -7,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
 import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
@@ -48,7 +47,7 @@ class SignUpFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
         val signUpFragmentBinding = FragmentSignUpBinding.inflate(layoutInflater, container, false)
         signUpFragmentBinding.tryToSignIn.setOnClickListener {
@@ -56,7 +55,7 @@ class SignUpFragment : Fragment() {
         }
         dataProfile.observe(viewLifecycleOwner){
             if (it.id != 0 || it.token != null) {
-                findNavController().popBackStack()
+                findNavController().navigate(R.id.action_signInFragment_to_profileFragment)
             }
         }
         signUpFragmentBinding.signUp.setOnClickListener {

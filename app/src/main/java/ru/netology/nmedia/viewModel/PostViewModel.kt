@@ -19,9 +19,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.collectLatest
 import ru.netology.nmedia.FeedModelState
-import ru.netology.nmedia.PostRepositoryEntryPoint
+import ru.netology.nmedia.entryPoints.PostRepositoryEntryPoint
 import ru.netology.nmedia.dao.ProfileDao
-import ru.netology.nmedia.repository.AllPostsRepository
 import ru.netology.nmedia.requests.PostCreateRequest
 import ru.netology.nmedia.responses.Error
 
@@ -34,7 +33,7 @@ class PostViewModel @AssistedInject constructor(
     val profileDao: ProfileDao
 ) : ViewModel() {
 
-    val entryPoint: PostRepositoryEntryPoint =
+    private val entryPoint: PostRepositoryEntryPoint =
         EntryPointAccessors.fromApplication(context, PostRepositoryEntryPoint::class.java)
     val repository: PostRepository = when (authorId) {
         0 -> entryPoint.myPostRepository()
@@ -44,8 +43,8 @@ class PostViewModel @AssistedInject constructor(
     val data = repository
         .data
         .cachedIn(viewModelScope)
-    val _dataState: MutableLiveData<ru.netology.nmedia.FeedModelState> = MutableLiveData()
-    val dataState: LiveData<ru.netology.nmedia.FeedModelState>
+    private val _dataState: MutableLiveData<FeedModelState> = MutableLiveData()
+    val dataState: LiveData<FeedModelState>
         get() = _dataState
 
     init {

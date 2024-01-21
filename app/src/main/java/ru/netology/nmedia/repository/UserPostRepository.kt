@@ -1,6 +1,5 @@
 package ru.netology.nmedia.repository
 
-import androidx.paging.ExperimentalPagingApi
 import androidx.paging.InvalidatingPagingSourceFactory
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
@@ -25,7 +24,7 @@ class UserPostsRepository @AssistedInject constructor(
     profileDao: ProfileDao
 ) : PostRepository( retrofitService= retrofitService) {
 
-    val invalidatingPagingSourceFactory = InvalidatingPagingSourceFactory{
+    private val invalidatingPagingSourceFactory = InvalidatingPagingSourceFactory{
         UserPostPagingSource(retrofitService,authorId,profileDao)
     }
     override val data: Flow<PagingData<Post>> = Pager(

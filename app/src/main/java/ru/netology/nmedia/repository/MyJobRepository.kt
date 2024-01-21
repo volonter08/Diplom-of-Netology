@@ -3,7 +3,6 @@ package ru.netology.nmedia.repository
 import androidx.room.withTransaction
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import ru.netology.nmedia.JobApiService
 import ru.netology.nmedia.MyJobApiService
 import ru.netology.nmedia.dao.jobDao.MyJobDao
 import ru.netology.nmedia.db.AppDb
@@ -19,8 +18,8 @@ class MyJobRepository @Inject constructor(
     myJobDao: MyJobDao,
     jobApiService: MyJobApiService,
 ) : JobRepository(appDb, jobApiService, 0) {
-    override val data: Flow<List<Job>> = myJobDao.getAll().map {
-        it.toDto().map {
+    override val data: Flow<List<Job>> = myJobDao.getAll().map { jobEntityList ->
+        jobEntityList.toDto().map {
             it.copy(ownedMe = true)
         }
     }

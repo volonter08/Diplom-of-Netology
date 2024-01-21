@@ -3,16 +3,12 @@ package ru.netology.nmedia.viewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import ru.netology.nmedia.FeedModelState
 import ru.netology.nmedia.OnRetryListener
 import ru.netology.nmedia.auth.AppAuth
-import ru.netology.nmedia.dto.Profile
 import ru.netology.nmedia.dto.User
 import ru.netology.nmedia.entity.utills.SingleLiveEvent
 import ru.netology.nmedia.repository.ProfileRepository
@@ -23,7 +19,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     val auth: AppAuth,
-    val profileRepository: ProfileRepository,
+    private val profileRepository: ProfileRepository,
 ) : ViewModel() {
     private val _dataState = MutableLiveData(FeedModelState())
     private val _dataProfile = SingleLiveEvent<User>()
@@ -53,5 +49,3 @@ class ProfileViewModel @Inject constructor(
         _dataState.value = FeedModelState(error = Error(reason, onRetryListener))
     }
 }
-
-data class ProfileState(val loading: Boolean = false, val error: Error? = null)

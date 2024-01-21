@@ -1,13 +1,16 @@
 <resources>
     <string name="app_name">NMedia!</string>
     <string name="text"> NMedia!</string>
-    <string name="authorTextSize"> 17sp</string>
+    <string name="authorTextSize">17sp</string>
     <string name="remove">Remove</string>
     <string name="update">Update</string>
-    <string name="edit_post">Edit Post</string>
-    <string name="edit_event">Edit Event</string>
-    <string name="error_message"> Error. To reload posts!</string>
-    <string name="empty_message"> List of posts is empty! </string>
+    <string name="edit_post">Edit post</string>
+    <string name="edit_event">Edit event</string>
+    <string name="empty_posts_message">List of posts is empty! </string>
+    <string name="empty_jobs_message">List of jobs is empty! </string>
+    <string name="empty_name_message">Field of name is empty! </string>
+    <string name="empty_position_message">Field of position is empty! </string>
+    <string name="empty_content_message">Field of content is empty! </string>
     <string name="request_is_not_successful"> Request is not successful!!</string>
     <string name="channel_remote_name" translatable="false">Server notifications</string>
     <string name="channel_remote_description" translatable="false">Notifications from remote server</string>
@@ -17,14 +20,36 @@
     <string name="sign_out">Sign out</string>
     <string name="profile">Profile</string>
     <string name="news">News</string>
-    <string name="login" formatted="false">Login:%s</string>
-    <string name="name" formatted="false">Name:%s</string>
+    <string name="login_format" formatted="true">Login: %s</string>
+    <string name="name_format" formatted="true">Name: %s</string>
+    <string name="name_job">Name</string>
+    <string name="name_job_format" formatted="true">Name: %s</string>
+    <string name="login">Login</string>
+    <string name="name">Name</string>
+    <string name="position_format" formatted="true">Position: %s</string>
+    <string name="position">Position</string>
+    <string name="start">Start</string>
+    <string name="finish">Finish</string>
+    <string name="content">Content</string>
+    <string name="link">Link</string>
+    <string name = "date_time">Date time</string>
     <string name="my_profile">My Profile</string>
     <string name="participate">Participate</string>
     <string name="member">Member</string>
-    <string name="count_members">%$d\nmembers</string>
+    <string name="count_members">%s\nmembers</string>
+    <string name = "work_date">%s — %s </string>
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="choose_date_time">Choose date time</string>
+    <string name="create">CREATE</string>
+    <string name= "edit">EDIT</string>
+    <string name="to_present_day">to present day</string>
+    <string name="p.d">p.d</string>
+    <string name="pick_date_of_finish">pick date of finish</string>
+    <string name="login_to_your_personal_account_to_continue_working">Login to your personal account to continue working</string>
+    <string name="password">Password</string>
+    <string name="don_t_have_any_account_yet">Don\'t have any account yet?</string>
+    <string name="create_new_account">Create new acctount</string>
+    <string name="have_already_account">Have already account</string>
+    <string name="edit_job">Edit job</string>
     <!-- TODO: Remove or change this placeholder text -->
 </resources>

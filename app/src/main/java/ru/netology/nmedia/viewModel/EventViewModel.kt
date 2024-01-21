@@ -1,6 +1,5 @@
 package ru.netology.nmedia.viewModel
 
-import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -12,7 +11,7 @@ import ru.netology.nmedia.OnRetryListener
 import ru.netology.nmedia.auth.AppAuth
 import kotlinx.coroutines.launch
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
@@ -21,13 +20,11 @@ import ru.netology.nmedia.dao.ProfileDao
 import ru.netology.nmedia.dto.Event
 import ru.netology.nmedia.repository.EventRepository
 import ru.netology.nmedia.requests.EventCreateRequest
-import ru.netology.nmedia.requests.PostCreateRequest
 import ru.netology.nmedia.responses.Error
 import javax.inject.Inject
 
 @HiltViewModel
 class EventViewModel @Inject constructor(
-    @ApplicationContext context: Context,
     private val repository: EventRepository,
     val auth: AppAuth,
     val profileDao: ProfileDao
@@ -35,25 +32,23 @@ class EventViewModel @Inject constructor(
     private val cached = repository
         .data
         .cachedIn(viewModelScope)
-
-    var tokenAccess:String? = null
+    @OptIn(ExperimentalCoroutinesApi::class)
     val data: Flow<PagingData<Event>> = auth.authStateFlow
-        .flatMapLatest { (myId, token, _, _, _) ->
-            tokenAccess= token
+        .flatMapLatest { (myId, _, _, _, _) ->
             cached.map { pagingData ->
                 pagingData.map { post ->
                     post.copy(ownedByMe = post.authorId == myId,likedByMe = post.likeOwnerIds.contains(myId))
                 }
             }
         }
-    val _dataState: MutableLiveData<ru.netology.nmedia.FeedModelState> = MutableLiveData()
-    val dataState: LiveData<ru.netology.nmedia.FeedModelState>
+    private val _dataState: MutableLiveData<FeedModelState> = MutableLiveData()
+    val dataState: LiveData<FeedModelState>
         get() = _dataState
 
     fun like(likedEvent: Event) {
         viewModelScope.launch {
             try {
-                repository.like(likedEvent,tokenAccess)
+                repository.like(likedEvent,profileDao.getAccessToken())
                 _dataState.setValue(FeedModelState())
             } catch (e: Exception) {
                 onError(e.message?:"") {
@@ -66,7 +61,7 @@ class EventViewModel @Inject constructor(
     fun dislike(disLikedEvent: Event) {
         viewModelScope.launch {
             try {
-                repository.dislike(disliked = disLikedEvent, tokenAccess )
+                repository.dislike(disliked = disLikedEvent, profileDao.getAccessToken() )
                 _dataState.setValue(FeedModelState())
             } catch (e: Exception) {
                 onError(e.message?:"") {
@@ -78,9 +73,9 @@ class EventViewModel @Inject constructor(
     fun remove(event: Event) {
         viewModelScope.launch {
             try {
-                repository.remove(event, tokenAccess)
-            } catch (_: Exception) {
-                onError("Request is not succesfull") {
+                repository.remove(event, profileDao.getAccessToken())
+            } catch (e: Exception) {
+                onError(e.message?:"") {
                     remove(event)
                 }
             }
@@ -90,7 +85,7 @@ class EventViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 _dataState.value = FeedModelState(loading = true)
-                repository.save(eventCreateRequest,tokenAccess)
+                repository.save(eventCreateRequest,profileDao.getAccessToken())
                 _dataState.value = FeedModelState(isSaved = true)
             } catch (e: Exception) {
                 onError(e.message?:"") {

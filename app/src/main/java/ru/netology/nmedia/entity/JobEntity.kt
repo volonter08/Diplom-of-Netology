@@ -3,7 +3,6 @@ package ru.netology.nmedia.entity
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import ru.netology.nmedia.dto.Job
-import ru.netology.nmedia.dto.Post
 import java.util.Date
 
 abstract class JobEntity(
@@ -27,11 +26,6 @@ class MyJobEntity (
     link:String?
 ):JobEntity(id,name,position,start,finish,link){
     constructor(job:Job) : this(job.id,job.name,job.position,job.start,job.finish,job.link)
-    companion object{
-        fun fromDto(dto:Job) = dto.run {
-            MyJobEntity(id, name, position, start, finish, link)
-        }
-    }
 }
 fun List<Job>.toMyEntity(): List<MyJobEntity> = map{
     MyJobEntity(it)

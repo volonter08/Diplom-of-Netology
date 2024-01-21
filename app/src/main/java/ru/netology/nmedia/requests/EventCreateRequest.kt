@@ -3,10 +3,8 @@ package ru.netology.nmedia.requests
 import android.icu.text.SimpleDateFormat
 import ru.netology.nmedia.dto.Coordinates
 import ru.netology.nmedia.dto.Event
-import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.model.Attachment
 import ru.netology.nmedia.model.TypeOnline
-import java.util.Date
 
 data class EventCreateRequest(
     override val id: Int = 0,

@@ -13,7 +13,7 @@ import ru.netology.nmedia.viewHolder.JobHolder
 class JobAdapter(val listener:OnButtonTouchListener): ListAdapter<Job, JobHolder>(JobDiffCallback()) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): JobHolder {
         val jobBinding = JobBinding.inflate(LayoutInflater.from(parent.context),parent,false)
-        return JobHolder(jobBinding, listener)
+        return JobHolder(parent.context,jobBinding, listener)
     }
 
     override fun onBindViewHolder(holder: JobHolder, position: Int) {

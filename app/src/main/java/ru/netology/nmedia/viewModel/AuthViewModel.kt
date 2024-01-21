@@ -3,23 +3,21 @@ package ru.netology.nmedia.viewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
-import ru.netology.nmedia.auth.AppAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import okhttp3.FormBody
 import ru.netology.nmedia.AuthApiService
 import ru.netology.nmedia.FeedModelState
 import ru.netology.nmedia.OnRetryListener
+import ru.netology.nmedia.auth.AppAuth
 import ru.netology.nmedia.dto.User
 import ru.netology.nmedia.exceptions.AuthException
 import ru.netology.nmedia.requests.AuthenticationRequest
 import ru.netology.nmedia.responses.Error
 import ru.netology.nmedia.responses.ErrorResponse
 import javax.inject.Inject
-import kotlin.Exception
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
@@ -27,7 +25,7 @@ class AuthViewModel @Inject constructor(
     private val apiService: AuthApiService
 ) : ViewModel() {
     val gson = Gson()
-    val _dataState = MutableLiveData(FeedModelState())
+    private val _dataState = MutableLiveData(FeedModelState())
 
     val dataState:LiveData<FeedModelState>
         get() {

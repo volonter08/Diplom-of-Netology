@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import ru.netology.nmedia.FeedModelState
 import ru.netology.nmedia.OnRetryListener
-import ru.netology.nmedia.JobRepositoryEntryPoint
+import ru.netology.nmedia.entryPoints.JobRepositoryEntryPoint
 import ru.netology.nmedia.auth.AppAuth
 import ru.netology.nmedia.dao.ProfileDao
 import ru.netology.nmedia.dto.Job
@@ -32,7 +32,7 @@ class JobViewModel @AssistedInject constructor(
     val profileDao: ProfileDao
 ) : ViewModel() {
 
-    val entryPoint: JobRepositoryEntryPoint =
+    private val entryPoint: JobRepositoryEntryPoint =
         EntryPointAccessors.fromApplication(context, JobRepositoryEntryPoint::class.java)
     val repository: JobRepository = when (userId) {
         0 -> entryPoint.myJobRepository()
@@ -40,7 +40,7 @@ class JobViewModel @AssistedInject constructor(
     }
 
     val data: Flow<List<Job>> = repository.data
-    val _dataState: MutableLiveData<FeedModelState> = MutableLiveData()
+    private val _dataState: MutableLiveData<FeedModelState> = MutableLiveData()
     val dataState: LiveData<FeedModelState>
         get() = _dataState
     init {
@@ -73,7 +73,7 @@ class JobViewModel @AssistedInject constructor(
         }
     }
 
-    fun save(jobCreateRequest:JobCreateRequest) {
+    fun saveJob(jobCreateRequest:JobCreateRequest) {
         viewModelScope.launch {
             try {
                 _dataState.value = FeedModelState(loading = true)
@@ -81,7 +81,7 @@ class JobViewModel @AssistedInject constructor(
                 _dataState.value = FeedModelState(isSaved = true)
             } catch (e: Exception) {
                 onError(e.message ?: "") {
-                   save(jobCreateRequest)
+                   saveJob(jobCreateRequest)
                 }
             }
         }

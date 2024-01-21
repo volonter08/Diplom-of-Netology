@@ -52,9 +52,9 @@ class UserFragment : Fragment() {
     lateinit var errorCallback: ErrorCallback
 
     // TODO: Rename and change types of parameters
-    var userId by Delegates.notNull<Int>()
+    private var userId by Delegates.notNull<Int>()
     private lateinit var userFragmentBinding: FragmentUserBinding
-    private val postViewModel: PostViewModel by viewModels<PostViewModel>(
+    private val postViewModel: PostViewModel by viewModels(
         extrasProducer = {
             defaultViewModelCreationExtras.withCreationCallback<
                     PostViewModelFactory> { factory ->
@@ -83,7 +83,7 @@ class UserFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         userFragmentBinding = FragmentUserBinding.inflate(inflater, container, false)
 
         // Inflate the layout for this fragment
@@ -140,14 +140,14 @@ class UserFragment : Fragment() {
             val animPlaceHolder =
                 requireContext().getDrawable(R.drawable.loading_avatar) as AnimatedImageDrawable
             animPlaceHolder.start()// probably needed
-            Glide.with(requireContext()).load(it?.avatar).circleCrop()
+            Glide.with(requireContext()).load(it.avatar).circleCrop()
                 .placeholder(animPlaceHolder)
                 .timeout(10_000).error(R.drawable.null_avatar)
                 .into(userFragmentBinding.profileAvatar)
         }
-        profileViewModel.dataState.observe(viewLifecycleOwner) {
-            userFragmentBinding.progressBarLayout.isVisible = it.loading
-            it.error?.let {
+        profileViewModel.dataState.observe(viewLifecycleOwner) { feedModelState ->
+            userFragmentBinding.progressBarLayout.isVisible = feedModelState.loading
+            feedModelState.error?.let {
                 errorCallback.onError(it.reason, it.onRetryListener)
             }
         }

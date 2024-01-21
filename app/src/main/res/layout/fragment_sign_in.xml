@@ -29,7 +29,7 @@ android:layout_height="match_parent">
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="20dp"
             android:fontFamily="sans-serif-black"
-            android:text="Sign In"
+            android:text="@string/sign_in"
             android:textSize="32sp" />
 
         <TextView
@@ -40,7 +40,7 @@ android:layout_height="match_parent">
             android:layout_marginTop="20dp"
             android:fontFamily="sans-serif"
             android:gravity="center"
-            android:text="Log in to your personal account to continue working"
+            android:text="@string/login_to_your_personal_account_to_continue_working"
             android:textSize="15sp" />
 
         <TextView
@@ -49,7 +49,7 @@ android:layout_height="match_parent">
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:fontFamily="sans-serif"
-            android:text="Login"
+            android:text="@string/login"
             android:textSize="16sp" />
         <LinearLayout
             android:layout_width="match_parent"
@@ -74,7 +74,7 @@ android:layout_height="match_parent">
 
             android:layout_marginTop="20dp"
             android:fontFamily="sans-serif"
-            android:text="Password"
+            android:text="@string/password"
             android:textSize="16sp" />
 
         <LinearLayout
@@ -98,7 +98,7 @@ android:layout_height="match_parent">
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:text="Sign In" />
+            android:text="@string/sign_in" />
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -112,7 +112,7 @@ android:layout_height="match_parent">
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:fontFamily="sans-serif"
-                android:text="Don't have any account yet?"
+                android:text="@string/don_t_have_any_account_yet"
                 android:textSize="15sp" />
             <TextView
                 android:id="@+id/try_to_sign_up"
@@ -122,7 +122,7 @@ android:layout_height="match_parent">
                 android:layout_marginStart="5dp"
                 android:fontFamily="sans-serif"
                 android:textColor="?attr/colorAccent"
-                android:text="Sign up"
+                android:text="@string/sign_up"
                 android:textSize="15sp" />
         </LinearLayout>
     </LinearLayout>

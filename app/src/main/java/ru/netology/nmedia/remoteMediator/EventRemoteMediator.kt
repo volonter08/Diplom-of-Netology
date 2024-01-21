@@ -1,7 +1,5 @@
 package ru.netology.nmedia.remoteMediator
 
-import android.icu.text.DateFormat
-import android.icu.text.SimpleDateFormat
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
 import androidx.paging.PagingState

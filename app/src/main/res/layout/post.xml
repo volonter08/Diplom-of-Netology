@@ -132,17 +132,6 @@
         app:layout_constraintStart_toStartOf="parent"
         />
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/share"
-        style="@style/Widget.App.TextButton.Share"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="14dp"
-        android:background="@android:color/transparent"
-        app:icon="@drawable/baseline_share_24"
-        app:layout_constraintTop_toBottomOf="@id/barrier2"
-        app:layout_constraintStart_toEndOf="@id/like"
-        />
-    <com.google.android.material.button.MaterialButton
         android:id="@+id/mentioned"
         style="@style/Widget.App.TextButton.Share"
         android:layout_width="wrap_content"

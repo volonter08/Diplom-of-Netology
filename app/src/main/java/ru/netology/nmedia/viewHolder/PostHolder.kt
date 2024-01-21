@@ -25,7 +25,7 @@ import ru.netology.nmedia.enumeration.AttachmentType
 
 class PostHolder(
     val context: Context,
-    val binding: PostBinding,
+    private val binding: PostBinding,
     private val listener: OnButtonTouchListener
 ) : RecyclerView.ViewHolder(binding.root) {
 
@@ -48,7 +48,6 @@ class PostHolder(
             isVisible = false
         }
         val likeButton = binding.like
-        val shareButton = binding.share
         val mentionedButton = binding.mentioned
 
         avatarImageView.also {
@@ -145,7 +144,7 @@ class PostHolder(
                 else
                     listener.onDislikeCLick(post)
             }
-            addOnCheckedChangeListener { button, isChecked ->
+            addOnCheckedChangeListener { button, _ ->
                 button.isChecked = post.likedByMe
             }
             isChecked = post.likedByMe

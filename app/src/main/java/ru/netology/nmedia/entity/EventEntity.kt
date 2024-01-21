@@ -33,7 +33,8 @@ data class EventEntity(
     val ownedByMe: Boolean = false,
     val users: Map<String, UserPreview>
 ){
-    fun toDto() = Event(id, authorId, author?:"", authorAvatar?:"", authorJob?:"", content?:"", datetime ,published,coords?.toDto(), typev, link?:"",likeOwnerIds, likedByMe,speakerIds,participantsIds,participatedByMe, attachment?.toDto(), ownedByMe, users )
+    fun toDto() = Event(id, authorId, author?:"", authorAvatar?:"", authorJob?:"", content?:"", datetime ,published,coords?.toDto(),
+        typev, link?:"",likeOwnerIds, likedByMe,speakerIds,participantsIds,participatedByMe, attachment?.toDto(), ownedByMe, users )
 
     companion object {
         fun fromDto(dto: Event) =dto.run{

@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="sign_in">Sign in</string>
-    <string name="sign_up">Sign up</string>
-    <string name="sign_out">Sign out</string>
-    <string name="choose_date_time">Choose date time</string>
-</resources>

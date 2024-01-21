@@ -1,8 +1,6 @@
 package ru.netology.nmedia.dto
 
-import ru.netology.nmedia.entity.PostEntity
 import ru.netology.nmedia.model.Attachment
-import java.io.Serializable
 import java.util.Date
 
 data class Post(

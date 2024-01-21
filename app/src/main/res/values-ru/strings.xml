@@ -1,25 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">НМедиа</string>
-    <string name = "text"> НМедиа!</string>
+    <string name="text"> НМедиа!</string>
     <string name="authorTextSize"> 17sp</string>
     <string name="remove">Удалить</string>
     <string name="update">Редактировать</string>
     <string name="edit_post">Редактировать пост</string>
     <string name="edit_event">Редактировать событие</string>
-    <string name = "error_message"> Ошибка. Перезапустите загрузку постов!</string>
-    <string name = "empty_message"> Список постов пуст! </string>
-    <string name = "request_is_not_successful" > Запрос не успешен!!!</string>
+    <string name="edit_job">Редактировать место работы</string>
+    <string name="empty_posts_message"> Список постов пуст! </string>
+    <string name="empty_jobs_message"> Список работ пуст! </string>
+    <string name="empty_name_message">Поле названия пустое! </string>
+    <string name="empty_position_message">Поле позиции пустое! </string>
+    <string name="empty_content_message">Поле контента пустое! </string>
+    <string name="request_is_not_successful"> Запрос не успешен!!!</string>
     <string name="sign_in">Sign in</string>
     <string name="sign_up">Sign up</string>
     <string name="sign_out">Sign out</string>
     <string name="profile">Профиль</string>
     <string name="news">Новости</string>
-    <string name = "login" formatted="true">Логин:%s</string>
-    <string name = "name" formatted="true">Имя:%s</string>
+    <string name="login_format" formatted="true">Логин:%s</string>
+    <string name="name_format" formatted="true">Имя:%s</string>
+    <string name="login" formatted="true">Логин</string>
+    <string name="name" formatted="true">Имя</string>
+    <string name="name_job">Название</string>
+    <string name="name_job_format" formatted="true">Название: %s</string>
+    <string name="position_format" formatted="true">Позиция: %s</string>
+    <string name="position">Позиция</string>
+    <string name="start">Начало</string>
+    <string name="finish">Окончание</string>
+    <string name="content">Контент</string>
+    <string name="link">Ссылка</string>
+    <string name ="date_time">Время встречи:</string>
     <string name="my_profile">Мой профиль</string>
-    <string name = "participate">Участвовать</string>
-    <string name= "member">Участник</string>
-    <string name="count_members">%$d\nучастников</string>
+    <string name="participate">Участвовать</string>
+    <string name="member">Участник</string>
+    <string name="count_members">%s\nучастников</string>
+    <string name="work_date">%s  %s</string>
     <string name="choose_date_time">Выберите дату провед-ия</string>
+    <string name="create">СОЗДАТЬ</string>
+    <string name= "edit">РЕДАКТИРОВАТЬ</string>
+    <string name="to_present_day">по настоящее время</string>
+    <string name="p.d">н.в</string>
+    <string name="pick_date_of_finish">указать дату окончания</string>
+    <string name="login_to_your_personal_account_to_continue_working">Войдите в ваш персональный аккаунт,чтобы продолжить</string>
+    <string name="password">Пароль</string>
+    <string name="don_t_have_any_account_yet">Не имеете еще аккаунт?</string>
+    <string name="create_new_account">Создание нового аккаунта</string>
+    <string name="have_already_account">Уже есть аккаунт</string>
+
 </resources>

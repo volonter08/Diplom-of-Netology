@@ -1,7 +1,6 @@
 package ru.netology.nmedia
 
 import android.graphics.Point
-import android.view.MotionEvent
 import ru.netology.nmedia.dto.Note
 
 interface OnButtonTouchListener {

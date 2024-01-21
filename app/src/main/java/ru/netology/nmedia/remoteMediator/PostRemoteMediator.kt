@@ -1,7 +1,5 @@
 package ru.netology.nmedia.remoteMediator
 
-import android.icu.text.DateFormat
-import android.icu.text.SimpleDateFormat
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
 import androidx.paging.PagingState
@@ -58,6 +56,7 @@ class PostRemoteMediator<T : PostEntity, V : PostRemoteKeyEntity> @Inject constr
         try {
             val response = when (loadType) {
                 LoadType.REFRESH -> {
+                    println("dfdf")
                     service.getLatestPosts(
                         state.config.initialLoadSize,
                         profileDao.getAccessToken()
@@ -81,11 +80,13 @@ class PostRemoteMediator<T : PostEntity, V : PostRemoteKeyEntity> @Inject constr
             if (!response.isSuccessful) {
                 throw Exception()
             }
-            val body = (response.body()?: throw Exception())
-            if (body.isNotEmpty()) {
-                db.withTransaction {
-                    when (loadType) {
-                        LoadType.REFRESH -> {
+            val body = (response.body() ?: throw Exception())
+            db.withTransaction {
+                when (loadType) {
+                    LoadType.REFRESH -> {
+                        postDao.removeAll()
+                        postRemoteKeyDao.removeAll()
+                        if (body.isNotEmpty())
                             postRemoteKeyDao.insert(
                                 when {
                                     v.isAssignableFrom(AllPostRemoteKeyEntity::class.java) -> {
@@ -121,74 +122,76 @@ class PostRemoteMediator<T : PostEntity, V : PostRemoteKeyEntity> @Inject constr
                                     }
                                 }
                             )
-                            postDao.removeAll()
-                        }
-
-                        LoadType.APPEND -> {
-                            postRemoteKeyDao.insert(
-                                when{
-                                    v.isAssignableFrom(AllPostRemoteKeyEntity::class.java)->{
-                                        AllPostRemoteKeyEntity(
-                                            type = KeyType.BEFORE,
-                                            id = body.last().id
-                                        ) as V
-                                    }
-                                    v.isAssignableFrom(MyPostRemoteKeyEntity::class.java)->{
-                                        MyPostRemoteKeyEntity(
-                                            type = KeyType.BEFORE,
-                                            id = body.last().id
-                                        ) as V
-                                    }
-                                    else -> {
-                                        MyPostRemoteKeyEntity(
-                                            type = KeyType.BEFORE,
-                                            id = body.last().id
-                                        ) as V
-                                    }
-                                }
-
-                            )
-                        }
-
-                        LoadType.PREPEND -> {
-                            postRemoteKeyDao.insert(
-                                when{
-                                    v.isAssignableFrom(AllPostRemoteKeyEntity::class.java)->{
-                                        AllPostRemoteKeyEntity(
-                                            type = KeyType.AFTER,
-                                            id = body.first().id
-                                        ) as V
-                                    }
-                                    v.isAssignableFrom(MyPostRemoteKeyEntity::class.java)->{
-                                        MyPostRemoteKeyEntity(
-                                            type = KeyType.AFTER,
-                                            id = body.first().id
-                                        ) as V
-                                    }
-                                    else -> {
-                                        MyPostRemoteKeyEntity(
-                                            type = KeyType.AFTER,
-                                            id = body.first().id
-                                        ) as V
-                                    }
-                                }
-
-                            )
-                        }
                     }
-                    when {
-                        t.isAssignableFrom(MyPostEntity::class.java) ->
-                            postDao.insert(body.toMyEntity() as List<T>)
 
-                        t.isAssignableFrom(AllPostEntity::class.java) ->
-                            postDao.insert(body.toAllEntity() as List<T>)
+                    LoadType.APPEND -> {
+                        if (body.isNotEmpty())
+                            postRemoteKeyDao.insert(
+                                when {
+                                    v.isAssignableFrom(AllPostRemoteKeyEntity::class.java) -> {
+                                        AllPostRemoteKeyEntity(
+                                            type = KeyType.BEFORE,
+                                            id = body.last().id
+                                        ) as V
+                                    }
+
+                                    v.isAssignableFrom(MyPostRemoteKeyEntity::class.java) -> {
+                                        MyPostRemoteKeyEntity(
+                                            type = KeyType.BEFORE,
+                                            id = body.last().id
+                                        ) as V
+                                    }
+
+                                    else -> {
+                                        MyPostRemoteKeyEntity(
+                                            type = KeyType.BEFORE,
+                                            id = body.last().id
+                                        ) as V
+                                    }
+                                }
+
+                            )
+                    }
+
+                    LoadType.PREPEND -> {
+                        if (body.isNotEmpty())
+                            postRemoteKeyDao.insert(
+                                when {
+                                    v.isAssignableFrom(AllPostRemoteKeyEntity::class.java) -> {
+                                        AllPostRemoteKeyEntity(
+                                            type = KeyType.AFTER,
+                                            id = body.first().id
+                                        ) as V
+                                    }
+
+                                    v.isAssignableFrom(MyPostRemoteKeyEntity::class.java) -> {
+                                        MyPostRemoteKeyEntity(
+                                            type = KeyType.AFTER,
+                                            id = body.first().id
+                                        ) as V
+                                    }
+
+                                    else -> {
+                                        MyPostRemoteKeyEntity(
+                                            type = KeyType.AFTER,
+                                            id = body.first().id
+                                        ) as V
+                                    }
+                                }
+
+                            )
                     }
                 }
-                return MediatorResult.Success(endOfPaginationReached = false)
+                when {
+                    t.isAssignableFrom(MyPostEntity::class.java) ->
+                        postDao.insert(body.toMyEntity() as List<T>)
+
+                    t.isAssignableFrom(AllPostEntity::class.java) ->
+                        postDao.insert(body.toAllEntity() as List<T>)
+                }
             }
-            else{
-                return MediatorResult.Success(endOfPaginationReached = false)
-            }
+            return MediatorResult.Success(endOfPaginationReached = false)
+
         } catch (e: Exception) {
             return MediatorResult.Error(e)
         }

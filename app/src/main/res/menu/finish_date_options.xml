@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:popupElevation = "5dp"
+  >
+  <item
+      android:id="@+id/to_present_day"
+      android:title="@string/to_present_day"
+      >
+  </item>
+  <item
+      android:id="@+id/pick_date_of_finish"
+      android:title="@string/pick_date_of_finish">
+  </item>
+</menu>

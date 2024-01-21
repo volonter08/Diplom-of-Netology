@@ -8,5 +8,4 @@ data class EventRemoteKeyEntity(
     @PrimaryKey
     val type: KeyType,
     val id: Int,
-) {
-}
+)

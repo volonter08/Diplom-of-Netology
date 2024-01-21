@@ -4,16 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#fadee7"
+    android:background="#70aaff"
     android:padding="16dp">
-
     <LinearLayout
-        android:id="@+id/main_layout_save_post"
+        android:id="@+id/main_layout_save_event"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:orientation="vertical">
-
         <LinearLayout
             android:id="@+id/linearLayoutUpdate"
             android:layout_width="match_parent"
@@ -31,12 +29,12 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="3"
                 android:layout_gravity="center_vertical"
-                android:gravity="center_vertical"
-                android:text="@string/edit_post"
-                android:textColor="?android:attr/statusBarColor"
                 android:layout_marginHorizontal="8dp"
+                android:layout_weight="3"
+                android:gravity="center_vertical"
+                android:text="@string/edit_job"
+                android:textColor="?attr/colorPrimary"
                 android:textSize="20sp" />
 
             <ImageButton
@@ -47,12 +45,14 @@
                 android:background="@android:color/transparent"
                 android:src="@drawable/baseline_cancel_24" />
         </LinearLayout>
-
         <RelativeLayout
             android:id="@+id/inputLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/border_item_post">
+            android:background="@drawable/border_item_job"
+            android:paddingVertical="20dp"
+            android:paddingHorizontal="20dp"
+            >
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -60,21 +60,54 @@
                 android:layout_alignParentStart="true"
                 android:layout_alignParentEnd="true"
                 android:layout_centerHorizontal="true"
-                android:layout_marginHorizontal="30dp"
-                android:layout_marginTop="20dp"
+
                 android:orientation="vertical">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/content" />
-
+                    android:text="@string/name_job" />
                 <EditText
-                    android:id="@+id/content_edit_text"
+                    android:id="@+id/name_edit_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp" />
 
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/position" />
+
+                <EditText
+                    android:id="@+id/position_edit_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/start" />
+
+                <TextView
+                    android:id="@+id/text_start_date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-black"
+                    android:layout_gravity="center_horizontal"
+                    android:textSize="20sp"
+                    />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/finish" />
+                <TextView
+                    android:id="@+id/text_finish_date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-black"
+                    android:layout_gravity="center_horizontal"
+                    android:textSize="20sp"
+                    />
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -86,13 +119,21 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp" />
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/save"
-                    style="@style/Widget.App.SaveOrCreateButton"
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:orientation="horizontal"
                     android:layout_gravity="end"
-                    android:layout_marginVertical="20dp" />
+                    android:layout_marginVertical="20dp"
+                    >
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/save"
+                        style="@style/Widget.App.SaveOrCreateButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end" />
+                </LinearLayout>
             </LinearLayout>
         </RelativeLayout>
     </LinearLayout>

@@ -13,7 +13,6 @@ import ru.netology.nmedia.dao.postDao.AllPostDao
 import ru.netology.nmedia.dao.postRemoteKeyDao.AllPostRemoteKeyDao
 import ru.netology.nmedia.db.AppDb
 import ru.netology.nmedia.dto.Post
-import ru.netology.nmedia.entity.AllPostEntity
 import ru.netology.nmedia.remoteMediator.PostRemoteMediator
 import javax.inject.Inject
 import javax.inject.Singleton

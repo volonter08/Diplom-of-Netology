@@ -19,7 +19,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
-import com.example.netologyandroidhomework1.RevealAnimationSetting
+import ru.netology.nmedia.entity.utills.RevealAnimationSetting
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 import kotlinx.coroutines.flow.collectLatest
@@ -29,7 +29,7 @@ import ru.netology.nmedia.R
 import ru.netology.nmedia.adapter.EventAdapter
 import ru.netology.nmedia.adapter.ItemLoadingStateAdapter
 import ru.netology.nmedia.adapter.PostAdapter
-import ru.netology.nmedia.databinding.FragmentPostDisplayBinding
+import ru.netology.nmedia.databinding.FragmentAllNotesBinding
 import ru.netology.nmedia.dto.Event
 import ru.netology.nmedia.dto.Note
 import ru.netology.nmedia.dto.Post
@@ -41,12 +41,12 @@ import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class PostDisplayFragment : Fragment() {
+class AllNotesFragment : Fragment() {
     @Inject
     lateinit var errorCallback: ErrorCallback
 
-    lateinit var viewBinding: FragmentPostDisplayBinding
-    private val postViewModel: PostViewModel by viewModels<PostViewModel>(
+    private lateinit var viewBinding: FragmentAllNotesBinding
+    private val postViewModel: PostViewModel by viewModels(
         extrasProducer = {
             defaultViewModelCreationExtras.withCreationCallback<
                     PostViewModelFactory> { factory ->
@@ -62,8 +62,8 @@ class PostDisplayFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        viewBinding = FragmentPostDisplayBinding.inflate(layoutInflater, container, false)
+    ): View {
+        viewBinding = FragmentAllNotesBinding.inflate(layoutInflater, container, false)
         val onButtonTouchListener = object : OnButtonTouchListener {
             override fun onLikeCLick(likedNote: Note) {
                 likedNote.run {
@@ -95,8 +95,8 @@ class PostDisplayFragment : Fragment() {
             override fun onUpdateCLick(note: Note, point: Point) {
                 note.run {
                     when (this) {
-                        is Post -> showSavePostFragment(point)
-                        is Event -> showSaveEventFragment(point)
+                        is Post -> showSavePostFragment(point,note as Post)
+                        is Event -> showSaveEventFragment(point, note as Event)
                     }
                 }
             }
@@ -195,21 +195,21 @@ class PostDisplayFragment : Fragment() {
                 }
             }
         }
-        viewBinding.createPostButton.setOnTouchListener { view, motionEvent ->
+        viewBinding.createPostButton.setOnTouchListener { _, motionEvent ->
             return@setOnTouchListener if (motionEvent.action == MotionEvent.ACTION_DOWN) {
                 showSavePostFragment(Point(motionEvent.rawX.toInt(), motionEvent.rawY.toInt()))
                 true
             } else false
         }
-        viewBinding.createEventButton.setOnTouchListener { view, motionEvent ->
+        viewBinding.createEventButton.setOnTouchListener { _, motionEvent ->
             return@setOnTouchListener if (motionEvent.action == MotionEvent.ACTION_DOWN) {
                 showSaveEventFragment(Point(motionEvent.rawX.toInt(), motionEvent.rawY.toInt()))
                 true
             } else false
         }
-        viewBinding.buttonSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
+        viewBinding.buttonSwitch.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
-                viewBinding.relativeEventLayout.isVisible = isChecked
+                viewBinding.relativeEventLayout.isVisible = true
                 ObjectAnimator.ofPropertyValuesHolder(
                     viewBinding.relativeEventLayout,
                     PropertyValuesHolder.ofFloat(View.ALPHA, 0F, 1F)
@@ -219,7 +219,7 @@ class PostDisplayFragment : Fragment() {
                 }.start()
                 viewBinding.relativePostLayout.visibility = View.GONE
             } else {
-                viewBinding.relativePostLayout.isVisible = !isChecked
+                viewBinding.relativePostLayout.isVisible = true
                 ObjectAnimator.ofPropertyValuesHolder(
                     viewBinding.relativePostLayout,
                     PropertyValuesHolder.ofFloat(View.ALPHA, 0F, 1F)
@@ -233,26 +233,20 @@ class PostDisplayFragment : Fragment() {
         return viewBinding.root
     }
 
-    fun showSavePostFragment(point: Point) {
+    fun showSavePostFragment(point: Point,post:Post? = null) {
         findNavController().navigate(
             R.id.action_postDisplayFragment_to_savePostFragment,
-            bundleOf("revealAnimationSetting" to constructRevealSettings(point))
+            bundleOf("revealAnimationSetting" to RevealAnimationSetting.create(point,viewBinding.root.width,viewBinding.root.height),
+            "post" to post
+                )
         )
     }
 
-    fun showSaveEventFragment(point: Point) {
+    fun showSaveEventFragment(point: Point,event:Event? = null) {
         findNavController().navigate(
             R.id.action_postDisplayFragment_to_saveEventFragment,
-            bundleOf("revealAnimationSetting" to constructRevealSettings(point = point))
-        )
-    }
-
-    private fun constructRevealSettings(point: Point): RevealAnimationSetting? {
-        return RevealAnimationSetting(
-            point.x,
-            point.y,
-            viewBinding.root.width,
-            viewBinding.root.height
+            bundleOf("revealAnimationSetting" to RevealAnimationSetting.create(point,viewBinding.root.width,viewBinding.root.height),
+            "event" to event)
         )
     }
 }

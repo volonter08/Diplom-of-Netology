@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.text.format.DateFormat
 import android.widget.TimePicker
 import androidx.fragment.app.DialogFragment
-import androidx.navigation.fragment.findNavController
 
 
 class TimePickerFragment : DialogFragment(), TimePickerDialog.OnTimeSetListener {

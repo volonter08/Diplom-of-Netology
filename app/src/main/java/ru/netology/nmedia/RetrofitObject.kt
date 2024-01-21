@@ -69,9 +69,6 @@ interface PostApiService {
 
     suspend fun getLatestPosts(count: Int, token: String?): Response<List<Post>>
 
-    @GET("api/posts/{id}")
-    suspend fun getPostById(@Path("id") id: Long): Response<Post>
-
     //CRUD posts
     @POST("api/posts")
     suspend fun savePost(@Body post: PostCreateRequest, @Header("Authorization") token: String?): Response<Post>
@@ -154,8 +151,6 @@ interface MyPostApiService : PostApiService {
 }
 
 interface UserPostApiService : PostApiService {
-    @GET("api/users/{userId}")
-    suspend fun getUserById(@Path("userId") userId: String): Response<User>
 
     @GET("api/{author_id}/wall/latest")
     suspend fun getLatestPost(
@@ -172,18 +167,9 @@ interface UserPostApiService : PostApiService {
         @Header("Authorization") token: String?
     ): Response<List<Post>>
 
-    @GET("api/{author_id}/wall/{post_id}/after")
-    suspend fun getAfterPost(
-        @Path("author_id") authorId: Int,
-        @Path("id") id: Int,
-        @Query("count") count: Int,
-        @Header("Authorization") token: String?
-    ): Response<List<Post>>
 }
 
 interface EventApiService {
-    @GET("api/events/{id}")
-    suspend fun getEventById(@Path("id") id: Long): Response<Event>
 
     //CRUD events
     @POST("api/events")

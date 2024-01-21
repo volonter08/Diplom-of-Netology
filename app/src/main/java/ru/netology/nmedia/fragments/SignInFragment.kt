@@ -13,7 +13,6 @@ import androidx.navigation.fragment.findNavController
 import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.FragmentSignInBinding
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.MutableStateFlow
 import ru.netology.nmedia.dto.Profile
 import ru.netology.nmedia.model.ErrorCallback
 import ru.netology.nmedia.viewModel.AuthViewModel
@@ -51,7 +50,7 @@ class SignInFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
         val signInFragmentBinding= FragmentSignInBinding.inflate(layoutInflater,container,false)
         signInFragmentBinding.tryToSignUp.setOnClickListener {
@@ -60,7 +59,7 @@ class SignInFragment : Fragment() {
         dataProfile.observe(viewLifecycleOwner){
             if (it.id != 0 || it.token != null) {
                 try {
-                    findNavController().popBackStack()
+                    findNavController().navigate(R.id.action_signInFragment_to_profileFragment)
                 }
                 catch (e:Exception){
                     e.printStackTrace()
@@ -78,9 +77,9 @@ class SignInFragment : Fragment() {
                 else-> authViewModel.signIn(login,password)
             }
         }
-        authViewModel.dataState.observe(viewLifecycleOwner){
-            signInFragmentBinding.progressBarLayout.isVisible = it.loading
-            it.error?.let {
+        authViewModel.dataState.observe(viewLifecycleOwner){ feedModelState ->
+            signInFragmentBinding.progressBarLayout.isVisible = feedModelState.loading
+            feedModelState.error?.let {
                 errorCallback.onError(it.reason,it.onRetryListener)
             }
         }

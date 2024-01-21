@@ -1,13 +1,11 @@
-package ru.netology.nmedia
+package ru.netology.nmedia.entryPoints
 
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.components.SingletonComponent
 import ru.netology.nmedia.repository.AllPostsRepository
 import ru.netology.nmedia.repository.MyPostsRepository
 import ru.netology.nmedia.repository.UserPostRepositoryFactory
-import ru.netology.nmedia.repository.UserPostsRepository
 
 @InstallIn(SingletonComponent::class)
 @EntryPoint

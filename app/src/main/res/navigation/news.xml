@@ -5,7 +5,7 @@
     app:startDestination="@id/postDisplayFragment">
     <fragment
         android:id="@+id/postDisplayFragment"
-        android:name="ru.netology.nmedia.fragments.PostDisplayFragment"
+        android:name="ru.netology.nmedia.fragments.AllNotesFragment"
         android:label="PostDisplayFragment">
         <action
             android:id="@+id/action_postDisplayFragment_to_savePostFragment"

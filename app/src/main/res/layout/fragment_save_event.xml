@@ -34,7 +34,7 @@
                 android:layout_marginHorizontal="8dp"
                 android:layout_weight="3"
                 android:gravity="center_vertical"
-                android:text="@string/edit_post"
+                android:text="@string/edit_event"
                 android:textColor="?attr/colorAccent"
                 android:textSize="20sp" />
 
@@ -68,7 +68,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Content:" />
+                    android:text="@string/content" />
 
                 <EditText
                     android:id="@+id/content_edit_text"
@@ -79,7 +79,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Link:" />
+                    android:text="@string/link" />
 
                 <EditText
                     android:id="@+id/link_edit_text"
@@ -89,7 +89,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Date time:" />
+                    android:text="@string/date_time" />
 
                 <TextView
                     android:id="@+id/text_time"
